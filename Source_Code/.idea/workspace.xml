@@ -4,19 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8cc7a614-e245-4d2b-bfdc-1b5ace720f78" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/FlightManagement/index.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FlightManagement/static/css/footer.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FlightManagement/static/css/header.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FlightManagement/static/css/menu.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FlightManagement/static/js/contact.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FlightManagement/templates/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FlightManagement/templates/layout/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FlightManagement/templates/layout/footer.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FlightManagement/templates/layout/header.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FlightManagement/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FlightManagement/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/models.py" afterDir="false" />
+    <list default="true" id="8cc7a614-e245-4d2b-bfdc-1b5ace720f78" name="Changes" comment="create header and footer">
+      <change beforePath="$PROJECT_DIR$/Requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,6 +100,14 @@
       <option name="presentableId" value="Default" />
       <updated>1669248554495</updated>
     </task>
+    <task id="LOCAL-00001" summary="create header and footer">
+      <created>1669563209630</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1669563209630</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -123,5 +120,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="create header and footer" />
+    <option name="LAST_COMMIT_MESSAGE" value="create header and footer" />
   </component>
 </project>
