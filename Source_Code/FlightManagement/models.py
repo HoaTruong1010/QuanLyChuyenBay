@@ -1,10 +1,11 @@
 from sqlalchemy import Column, Integer, String, Boolean, DECIMAL, ForeignKey, DateTime, Enum, Time, Text
 from sqlalchemy.orm import relationship
-from FlightManagement import db, app
+from FlightManagement import db, app, admin
 from enum import Enum as UserEnum
 from flask_login import UserMixin
 import hashlib
 from datetime import datetime
+from flask_admin.contrib.sqla import  ModelView
 
 class UserRole(UserEnum):
     USER = 1
@@ -156,24 +157,26 @@ class PlaneTicket(db.Model):
         return self.id
 
 
+# admin.add_view((ModelView()))
+
 if __name__ == '__main__':
     with app.app_context():
         # db.drop_all()
         # db.create_all()
 
-        password = str(hashlib.md5('123456'.encode('utf-8')).digest())
-        now = datetime.now()
-        u1 = User(id ='u1', name='An', username='an1100', password=password,
-                 userRole=UserRole.USER, active=True, joinDate=now,
-                 avatar='https://res.cloudinary.com/doaux2ndg/image/upload/v1669044208/cld-sample-5.jpg')
-        u2 = User(id='u2', name='Binh', username='binh1211', password=password,
-                  userRole=UserRole.EMPLOYEE, active=True, joinDate=now,
-                  avatar='https://res.cloudinary.com/doaux2ndg/image/upload/v1669044208/cld-sample-5.jpg')
-        u3 = User(id='u3', name='Dong', username='dong1100', password=password,
-                  userRole=UserRole.ADMIN, active=True, joinDate=now,
-                  avatar='https://res.cloudinary.com/doaux2ndg/image/upload/v1669044208/cld-sample-5.jpg')
-        db.session.add_all([u1, u2, u3])
-        db.session.commit()
+        # password = str(hashlib.md5('123456'.encode('utf-8')).digest())
+        # now = datetime.now()
+        # u1 = User(id ='u1', name='An', username='an1100', password=password,
+        #          userRole=UserRole.USER, active=True, joinDate=now,
+        #          avatar='https://res.cloudinary.com/doaux2ndg/image/upload/v1669044208/cld-sample-5.jpg')
+        # u2 = User(id='u2', name='Binh', username='binh1211', password=password,
+        #           userRole=UserRole.EMPLOYEE, active=True, joinDate=now,
+        #           avatar='https://res.cloudinary.com/doaux2ndg/image/upload/v1669044208/cld-sample-5.jpg')
+        # u3 = User(id='u3', name='Dong', username='dong1100', password=password,
+        #           userRole=UserRole.ADMIN, active=True, joinDate=now,
+        #           avatar='https://res.cloudinary.com/doaux2ndg/image/upload/v1669044208/cld-sample-5.jpg')
+        # db.session.add_all([u1, u2, u3])
+        # db.session.commit()
         #
         # p1 = Profile(id='01231', name='Nguyen Van An', gender='nam', dob=datetime(2002,1,1), email='an1100@gmail.com',
         #              phone='0176448394')
@@ -183,3 +186,9 @@ if __name__ == '__main__':
         #              phone='0176470094', isSupervisor=True)
         # db.session.add_all([p1, p2, p3])
         # db.session.commit()
+
+        pl1 = AirPlane(id='MB1', name='May bay 1', manufacturer='VN AirLine', totalSeat=60)
+        pl2 = AirPlane(id='MB2', name='May bay 2', manufacturer='VN AirLine', totalSeat=70)
+        pl3 = AirPlane(id='MB3', name='May bay 3', manufacturer='VN AirLine', totalSeat=65)
+        db.session.add_all([pl1, pl2, pl3])
+        db.session.commit()
