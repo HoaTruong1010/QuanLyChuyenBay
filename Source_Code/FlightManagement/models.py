@@ -16,13 +16,12 @@ class UserRole(UserEnum):
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
-    id = Column(String(10), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
     username = Column(String(50), nullable=False, unique=True)
     password = Column(String(50), nullable=False)
     active = Column(Boolean, default=True)
-    avatar = Column(String(100), nullable=False)
-    joinDate = Column(DateTime, nullable=False)
+    joined_date = Column(DateTime, default=datetime.now())
 
     userRole = Column(Enum(UserRole), default=UserRole.USER)
 
@@ -151,7 +150,7 @@ class PlaneTicket(db.Model):
     profile_id = (Column(Integer, ForeignKey(Profile.serial), nullable=False))
     flight_id = (Column(String(10), ForeignKey(Flight.id), nullable=False))
     seat_id = (Column(String(10), ForeignKey(Seat.id), nullable=False))
-    user_id = (Column(String(10), ForeignKey(User.id), nullable=False))
+    user_id = (Column(Integer, ForeignKey(User.id), nullable=False))
 
     def __str__(self):
         return self.id
@@ -164,19 +163,15 @@ if __name__ == '__main__':
         # db.drop_all()
         # db.create_all()
 
-        # password = str(hashlib.md5('123456'.encode('utf-8')).digest())
-        # now = datetime.now()
-        # u1 = User(id ='u1', name='An', username='an1100', password=password,
-        #          userRole=UserRole.USER, active=True, joinDate=now,
-        #          avatar='https://res.cloudinary.com/doaux2ndg/image/upload/v1669044208/cld-sample-5.jpg')
-        # u2 = User(id='u2', name='Binh', username='binh1211', password=password,
-        #           userRole=UserRole.EMPLOYEE, active=True, joinDate=now,
-        #           avatar='https://res.cloudinary.com/doaux2ndg/image/upload/v1669044208/cld-sample-5.jpg')
-        # u3 = User(id='u3', name='Dong', username='dong1100', password=password,
-        #           userRole=UserRole.ADMIN, active=True, joinDate=now,
-        #           avatar='https://res.cloudinary.com/doaux2ndg/image/upload/v1669044208/cld-sample-5.jpg')
-        # db.session.add_all([u1, u2, u3])
-        # db.session.commit()
+        password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
+        u1 = User(name='An', username='an1100', password=password,
+                 userRole=UserRole.USER)
+        u2 = User(name='Binh', username='binh1211', password=password,
+                  userRole=UserRole.EMPLOYEE)
+        u3 = User(name='Dong', username='dong1100', password=password,
+                  userRole=UserRole.ADMIN)
+        db.session.add_all([u1, u2, u3])
+        db.session.commit()
         #
         # p1 = Profile(id='01231', name='Nguyen Van An', gender='nam', dob=datetime(2002,1,1), email='an1100@gmail.com',
         #              phone='0176448394')
@@ -187,8 +182,8 @@ if __name__ == '__main__':
         # db.session.add_all([p1, p2, p3])
         # db.session.commit()
 
-        pl1 = AirPlane(id='MB1', name='May bay 1', manufacturer='VN AirLine', totalSeat=60)
-        pl2 = AirPlane(id='MB2', name='May bay 2', manufacturer='VN AirLine', totalSeat=70)
-        pl3 = AirPlane(id='MB3', name='May bay 3', manufacturer='VN AirLine', totalSeat=65)
-        db.session.add_all([pl1, pl2, pl3])
-        db.session.commit()
+        # pl1 = AirPlane(id='MB1', name='May bay 1', manufacturer='VN AirLine', totalSeat=60)
+        # pl2 = AirPlane(id='MB2', name='May bay 2', manufacturer='VN AirLine', totalSeat=70)
+        # pl3 = AirPlane(id='MB3', name='May bay 3', manufacturer='VN AirLine', totalSeat=65)
+        # db.session.add_all([pl1, pl2, pl3])
+        # db.session.commit()
