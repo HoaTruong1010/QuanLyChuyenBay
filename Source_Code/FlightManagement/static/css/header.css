@@ -23,6 +23,11 @@ section {
   margin-top: 50px;
 }
 
+.container{
+  margin: 2.5rem auto;
+  padding: 0 0.75rem;
+}
+
 ul {
   list-style-type: none;
 }
