@@ -1,7 +1,7 @@
 $(document).ready(function(){
-    $('.contact').click(function() {
+    $('#contact').click(function() {
         $('html, body').animate({
-            scrollTop: 500
+            scrollTop: 2500
         }, 1000)
     })
 })

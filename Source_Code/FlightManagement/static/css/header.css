@@ -42,6 +42,10 @@ a {
   align-items: center;
 }
 
+.container {
+    height: 100%;
+}
+
 /* --------header --------*/
 
 header {
