@@ -22,8 +22,9 @@ class User(db.Model, UserMixin):
     password = Column(String(50), nullable=False)
     active = Column(Boolean, default=True)
     joined_date = Column(DateTime, default=datetime.now())
-
     user_role = Column(Enum(UserRole), default=UserRole.USER)
+
+    tickets = relationship('PlaneTicket', backref='users')
 
     def __str__(self):
         return str(self.id)
@@ -68,6 +69,7 @@ class Seat(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(50), nullable=False)
     status = Column(Boolean, default=False)
+    unit_price = Column(DECIMAL(18,2), nullable=False)
 
     plane_id = Column(String(10), ForeignKey(AirPlane.id), nullable=False)
     tickets = relationship('PlaneTicket', backref='seats')
@@ -156,6 +158,18 @@ class PlaneTicket(db.Model):
         return str(self.id)
 
 
+class Regulation(db.Model):
+    __tablename__ = 'regulations'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50), nullable=False)
+    value = Column(String(50), nullable=False)
+    description = Column(Text)
+
+    def __str__(self):
+        return str(self.id)
+
+
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Profile, db.session))
 admin.add_view(ModelView(AirPlane, db.session))
@@ -165,6 +179,7 @@ admin.add_view(ModelView(AirLine, db.session))
 admin.add_view(ModelView(Flight, db.session))
 admin.add_view(ModelView(Flight_AirportMedium, db.session))
 admin.add_view(ModelView(PlaneTicket, db.session))
+admin.add_view(ModelView(Regulation, db.session))
 
 
 if __name__ == '__main__':
@@ -238,4 +253,13 @@ if __name__ == '__main__':
         #                  flight_id='CB3', seat_id='G2', user_id='2')
         # db.session.add_all([t1, t2, t3])
         # db.session.commit()
+
+        g1 = Regulation(name='book_time', value='12:00:00',
+                        description='Thời gian đặt vé trước 12h lúc chuyến bay khởi hành')
+        g2 = Regulation(name='sale_time', value='4:00:00',
+                        description='Thời gian bán vé trước 4h lúc chuyến bay khởi hành')
+        g3 = Regulation(name='rank_1', value='300000',
+                        description='Vé hạng 1 phụ thu 300.000 VND')
+        db.session.add_all([g1, g2, g3])
+        db.session.commit()
         pass
