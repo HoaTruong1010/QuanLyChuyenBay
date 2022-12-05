@@ -1,15 +1,13 @@
 from flask import render_template, request, redirect, url_for
-from FlightManagement import app, login, utils
+from FlightManagement import app, login, utils, controllers
 from FlightManagement.models import *
 from flask_login import login_user, logout_user
 
-
-@app.route("/")
-def index():
-    return render_template("index.html")
+app.add_url_rule('/', 'index', controllers.index)
+app.add_url_rule('/booking', 'booking', controllers.booking)
 
 
-@app.route("/", methods=['get','post'])
+@app.route("/", methods=['get', 'post'])
 def login_my_user():
     if request.method == "POST":
         username = request.form['username']
@@ -40,8 +38,8 @@ def register():
         if password.__eq__(confirm):
             try:
                 utils.register(name=request.form['name'],
-                             password=password,
-                             username=request.form['username'])
+                               password=password,
+                               username=request.form['username'])
 
                 return redirect('/')
             except:
@@ -50,7 +48,6 @@ def register():
             err_msg = 'Mật khẩu KHÔNG khớp!'
 
     return render_template('register.html', err_msg=err_msg)
-
 
 
 @login.user_loader

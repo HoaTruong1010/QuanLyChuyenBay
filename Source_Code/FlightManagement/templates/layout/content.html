@@ -1,33 +1,5 @@
 <!-- content -->
 <div class="content">
-   <span class="content-header">
-       Đặt vé máy bay
-    </span>
-
-    <div class="search-wrapper">
-        <div class="search-control">
-            <!-- Nav pills -->
-            <ul class="nav nav-pills">
-                <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="pill" href="#khuhoi">Khứ hồi</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="pill" href="#motchieu">Một chiều</a>
-                </li>
-            </ul>
-
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <div class="tab-pane container active" id="khuhoi">
-
-                </div>
-                <div class="tab-pane container fade" id="motchieu">...</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="content">
     <span class="content-header">
        Khám phá các chuyến bay phổ biến nhất
     </span>
@@ -41,115 +13,80 @@
         </span>
     </div>
 
-    <div class="flex content-wrapper">
-        <div class="flex col33">
-            <div class="flex col1">
-                <div class="image-wrapper">
-                    <img class="images" src="{{ url_for('static', filename= 'images/ThaiLan.jpg') }}" alt="Bangkok">
+    <div class="row">
+        {% for a in airports %}
+        <div class="col-md-4 col-sm-12" style="padding:1rem;">
+            <div class="image-wrapper">
+                <img class="images" src="{{ a.image }}" alt="a.location">
+            </div>
+
+            <div class="details">
+                <div class="details-header">
+                    <span>{{ a.location }}</span>
                 </div>
 
-                <div class="details">
-                    <div class="details-header">
-                        <span>Bangkok</span>
-                    </div>
-
-                    <div>
-                        <div class="flex details-items">
-                            <div class="img-icons">
-                                <img src="{{ url_for('static', filename='images/VJ.png') }}" alt="VietJet Air">
-                            </div>
-                            <div>
-                                <span class="infor">Thứ 7, ngày 27/11/2022</span>
-                                <br>
-                                <span>SGN - BKK, VietJet Air</span>
-                            </div>
-                            <div class="text">
-                                <span>Bay thẳng</span>
-                            </div>
+                <div>
+                    <div class="flex details-items">
+                        <div class="img-icons">
+                            <img src="{{ url_for('static', filename='images/VJ.png') }}" alt="VietJet Air">
+                        </div>
+                        <div>
+                            <span class="infor">Thứ 7, ngày 27/11/2022</span>
+                            <br>
+                            <span>SGN - BKK, VietJet Air</span>
+                        </div>
+                        <div class="text">
+                            <span>Bay thẳng</span>
                         </div>
                     </div>
                 </div>
-
-                <div class="flex prices">
-                    <span>2.000.000 ₫</span>
-                    <i class="fas fa-plane-departure"></i>
-                </div>
-                <br>
             </div>
-        </div>
 
-         <div class="flex col33">
-            <div class="flex col2">
-                <div class="image-wrapper">
-                    <img class="images" src="{{ url_for('static', filename= 'images/ThaiLan.jpg') }}" alt="Bangkok">
-                </div>
-
-                <div class="details">
-                    <div class="details-header">
-                        <span>Bangkok</span>
-                    </div>
-
-                    <div>
-                        <div class="flex details-items">
-                            <div class="img-icons">
-                                <img src="{{ url_for('static', filename='images/VJ.png') }}" alt="VietJet Air">
-                            </div>
-                            <div>
-                                <span class="infor">Thứ 7, ngày 27/11/2022</span>
-                                <br>
-                                <span>SGN - BKK, VietJet Air</span>
-                            </div>
-                            <div class="text">
-                                <span>Bay thẳng</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex prices">
-                    <span>2.000.000 ₫</span>
-                    <i class="fas fa-plane-departure"></i>
-                </div>
-                <br>
+            <div class="flex prices">
+                <span>2.000.000 ₫</span>
+                <i class="fas fa-plane-departure"></i>
             </div>
+            <br>
         </div>
-
-         <div class="flex col33">
-            <div class="flex col3">
-                <div class="image-wrapper">
-                   <img class="images" src="{{ url_for('static', filename= 'images/ThaiLan.jpg') }}" alt="Bangkok">
-                </div>
-
-                <div class="details">
-                    <div class="details-header">
-                        <span>Bangkok</span>
-                    </div>
-
-                    <div>
-                        <div class="flex details-items">
-                            <div class="img-icons">
-                                <img src="{{ url_for('static', filename='images/VJ.png') }}" alt="VietJet Air">
-                            </div>
-                            <div>
-                                <span class="infor">Thứ 7, ngày 27/11/2022</span>
-                                <br>
-                                <span>SGN - BKK, VietJet Air</span>
-                            </div>
-                            <div class="text">
-                                <span>Bay thẳng</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex prices">
-                    <span>2.000.000 ₫</span>
-                    <i class="fas fa-plane-departure"></i>
-                </div>
-                <br>
-            </div>
-        </div>
-
+        {% endfor %}
     </div>
 </div>
 
+<div class="content">
+   <span class="content-header">
+       Lên lịch ngay cho chuyến du lịch của mình nào
+    </span>
+
+    <div class="search-wrapper">
+        <div class="search-control">
+            <!-- Nav pills -->
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="pill" href="#HCM">Thành phố Hồ Chí Minh</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#HN">Hà Nội</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane container active" id="HCM">
+                    <div class="row">
+                        {% for air in airlines %}
+                        <div class="col-md-3 col-sm-12" style="padding:1rem;">
+                            <div class="card">
+                                <img class="card-img-top" src="{{ airports.image }}" alt="{{ airports.location }}">
+                                <div class="card-body">
+                                    <h4 class="card-title">{{ air.name }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="tab-pane container fade" id="HN">...</div>
+            </div>
+        </div>
+    </div>
+</div>

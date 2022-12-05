@@ -1,11 +1,13 @@
 from sqlalchemy import Column, Integer, String, Boolean, DECIMAL, ForeignKey, DateTime, Enum, Time, Text
 from sqlalchemy.orm import relationship
-from FlightManagement import db, app, admin
+from FlightManagement import db, app
 from enum import Enum as UserEnum
 from flask_login import UserMixin
 import hashlib
 from datetime import datetime, time
-from flask_admin.contrib.sqla import  ModelView
+
+
+# from flask_admin.contrib.sqla import  ModelView
 
 class UserRole(UserEnum):
     USER = 1
@@ -24,8 +26,6 @@ class User(db.Model, UserMixin):
     joined_date = Column(DateTime, default=datetime.now())
     user_role = Column(Enum(UserRole), default=UserRole.USER)
 
-    tickets = relationship('PlaneTicket', backref='users')
-
     def __str__(self):
         return str(self.id)
 
@@ -42,8 +42,6 @@ class Profile(db.Model):
     phone = Column(String(10), nullable=False)
     isSupervisor = Column(Boolean, default=False)
 
-    tickets = relationship('PlaneTicket', backref='profiles')
-
     def __str__(self):
         return str(self.id)
 
@@ -56,9 +54,6 @@ class AirPlane(db.Model):
     manufacturer = Column(String(50), nullable=False)
     totalSeat = Column(Integer, nullable=False)
 
-    seats = relationship('Seat', backref='airplanes')
-    flights = relationship('Flight', backref='airplanes')
-
     def __str__(self):
         return str(self.id)
 
@@ -69,10 +64,9 @@ class Seat(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(50), nullable=False)
     status = Column(Boolean, default=False)
-    unit_price = Column(DECIMAL(18,2), nullable=False)
 
     plane_id = Column(String(10), ForeignKey(AirPlane.id), nullable=False)
-    tickets = relationship('PlaneTicket', backref='seats')
+    plans = relationship("AirPlane", foreign_keys=[plane_id])
 
     def __str__(self):
         return str(self.id)
@@ -83,9 +77,8 @@ class AirPort(db.Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
+    image = Column(String(100))
     location = Column(String(100), nullable=False)
-
-    flight_airports = relationship('Flight_AirportMedium', backref='airports')
 
     def __str__(self):
         return str(self.id)
@@ -97,12 +90,11 @@ class AirLine(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(100), nullable=False)
 
-    from_airport_id = Column(Integer, ForeignKey(AirPort.id),nullable=False)
+    from_airport_id = Column(Integer, ForeignKey(AirPort.id), nullable=False)
     to_airport_id = Column(Integer, ForeignKey(AirPort.id), nullable=False)
 
     from_airport = relationship("AirPort", foreign_keys=[from_airport_id])
     to_airport = relationship("AirPort", foreign_keys=[to_airport_id])
-    flights = relationship('Flight', backref='airlines')
 
     def __str__(self):
         return str(self.id)
@@ -118,8 +110,8 @@ class Flight(db.Model):
 
     plane_id = (Column(String(10), ForeignKey(AirPlane.id), nullable=False))
     airline_id = (Column(String(10), ForeignKey(AirLine.id), nullable=False))
-    flight_airports = relationship('Flight_AirportMedium', backref='flights')
-    tickets = relationship('PlaneTicket', backref='flights')
+    planes = relationship("AirPlane", foreign_keys=[plane_id])
+    airlines = relationship("AirLine", foreign_keys=[airline_id])
 
     def __str__(self):
         return str(self.id)
@@ -128,16 +120,19 @@ class Flight(db.Model):
 class Flight_AirportMedium(db.Model):
     __tablename__ = 'flight_airport_mediums'
 
-    id = Column(String(10), primary_key=True)
+    name = Column(String(50), nullable=False)
     stopTimeMin = Column(Time, nullable=False)
     stopTimeMax = Column(Time, nullable=False)
     description = Column(Text)
 
-    flight_id = (Column(String(10), ForeignKey(Flight.id), nullable=False))
-    airport_medium_id = (Column(Integer, ForeignKey(AirPort.id), nullable=False))
+    flight_id = (Column(String(10), ForeignKey(Flight.id), primary_key=True))
+    airport_medium_id = (Column(Integer, ForeignKey(AirPort.id), primary_key=True))
+
+    flights = relationship("Flight", foreign_keys=[flight_id])
+    aiports = relationship("AirPort", foreign_keys=[airport_medium_id])
 
     def __str__(self):
-        return str(self.id)
+        return str(self.name)
 
 
 class PlaneTicket(db.Model):
@@ -145,14 +140,20 @@ class PlaneTicket(db.Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     rank = Column(Integer, nullable=False)
-    price = Column(DECIMAL(18,2), nullable=False)
+    price = Column(DECIMAL(18, 2), nullable=False)
     date = Column(DateTime, default=datetime.now())
-    place = Column(String(100), nullable=False)
 
+    place = Column(Integer, ForeignKey(AirPort.id), nullable=False)
     profile_id = (Column(Integer, ForeignKey(Profile.serial), nullable=False))
     flight_id = (Column(String(10), ForeignKey(Flight.id), nullable=False))
     seat_id = (Column(String(10), ForeignKey(Seat.id), nullable=False))
-    user_id = (Column(Integer, ForeignKey(User.id), nullable=False))
+    user_id = (Column(Integer, ForeignKey(User.id), nullable=True))
+
+    places = relationship("AirPort", foreign_keys=[place])
+    profiles = relationship("Profile", foreign_keys=[profile_id])
+    flights = relationship("Flight", foreign_keys=[flight_id])
+    seats = relationship("Seat", foreign_keys=[seat_id])
+    users = relationship("User", foreign_keys=[user_id])
 
     def __str__(self):
         return str(self.id)
@@ -170,26 +171,14 @@ class Regulation(db.Model):
         return str(self.id)
 
 
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Profile, db.session))
-admin.add_view(ModelView(AirPlane, db.session))
-admin.add_view(ModelView(Seat, db.session))
-admin.add_view(ModelView(AirPort, db.session))
-admin.add_view(ModelView(AirLine, db.session))
-admin.add_view(ModelView(Flight, db.session))
-admin.add_view(ModelView(Flight_AirportMedium, db.session))
-admin.add_view(ModelView(PlaneTicket, db.session))
-admin.add_view(ModelView(Regulation, db.session))
-
-
 if __name__ == '__main__':
     with app.app_context():
         # db.drop_all()
-        # db.create_all()
-
+        db.create_all()
+        #
         # password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
         # u1 = User(name='An', username='an1100', password=password,
-        #          user_role=UserRole.USER)
+        #           user_role=UserRole.USER)
         # u2 = User(name='Binh', username='binh1211', password=password,
         #           user_role=UserRole.EMPLOYEE)
         # u3 = User(name='Dong', username='dong1100', password=password,
@@ -197,11 +186,12 @@ if __name__ == '__main__':
         # db.session.add_all([u1, u2, u3])
         # db.session.commit()
 
-        # p1 = Profile(id='01231', name='Nguyen Van An', gender='nam', dob=datetime(2002,1,1), email='an1100@gmail.com',
+        # p1 = Profile(id='01231', name='Nguyen Van An', gender='nam', dob=datetime(2002, 1, 1), email='an1100@gmail.com',
         #              phone='0176448394')
         # p2 = Profile(id='01232', name='Le Thi Binh', gender='nu', dob=datetime(2001, 11, 6), email='binh1211@gmail.com',
         #              phone='0176640394')
-        # p3 = Profile(id='01233', name='Tran Van Dong', gender='nam', dob=datetime(2000, 4, 17), email='dong1100@gmail.com',
+        # p3 = Profile(id='01233', name='Tran Van Dong', gender='nam', dob=datetime(2000, 4, 17),
+        #              email='dong1100@gmail.com',
         #              phone='0176470094', isSupervisor=True)
         # db.session.add_all([p1, p2, p3])
         # db.session.commit()
@@ -218,16 +208,25 @@ if __name__ == '__main__':
         # db.session.add_all([s1, s2, s3])
         # db.session.commit()
 
-        # sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội')
-        # sb2 = AirPort(name='Sân bay Tân Sơn Nhất', location='Hồ Chí Minh')
-        # sb3 = AirPort(name='Sân bay Phù Cát', location='Bình Định')
-        # db.session.add_all([sb1, sb2, sb3])
+        # sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội',
+        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/HaNoi_wkzzg5.jpg')
+        # sb2 = AirPort(name='Sân bay Tân Sơn Nhất', location='Hồ Chí Minh',
+        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266575/Airport_Location/HCM_jpkw5e.jpg')
+        # sb3 = AirPort(name='Sân bay Phù Cát', location='Bình Định',
+        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/BinhDinh_c6yrif.jpg')
+        # sb4 = AirPort(name='Sân bay Narita', location='Nhật Bản',
+        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266739/Airport_Location/NhatBan_fzo3qw.jpg')
+        # sb5 = AirPort(name='Sân bay Bangkok', location='Thái Lan',
+        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266384/Airport_Location/ThaiLan_k533hb.jpg')
+        # db.session.add_all([sb1, sb2, sb3, sb4, sb5])
         # db.session.commit()
-
+        #
         # al1 = AirLine(id='1', name='Hà Nội - Hồ Chí Minh', from_airport_id='1', to_airport_id='2')
         # al2 = AirLine(id='2', name='Hà Nội - Bình Định', from_airport_id='1', to_airport_id='3')
         # al3 = AirLine(id='3', name='Bình Định - Hồ Chí Minh', from_airport_id='3', to_airport_id='2')
-        # db.session.add_all([al1, al2, al3])
+        # al4 = AirLine(id='4', name='Hồ Chí Minh - Nhật Bản', from_airport_id='2', to_airport_id='4')
+        # al5 = AirLine(id='5', name='Hồ Chí Minh - Thái Lan', from_airport_id='2', to_airport_id='5')
+        # db.session.add_all([al1, al2, al3, al4, al5])
         # db.session.commit()
 
         # f1 = Flight(id='CB1', name='Chuyến bay 001', departing_at=datetime(2022, 12, 1, 13, 00, 00),
@@ -239,27 +238,29 @@ if __name__ == '__main__':
         # db.session.add_all([f1, f2, f3])
         # db.session.commit()
 
-        # fam1 = Flight_AirportMedium(id='TG1', stopTimeMin=time(0, 20, 00), stopTimeMax=time(0, 20, 00),
+        # fam1 = Flight_AirportMedium(name='Tram dung 1', stopTimeMin=time(0, 20, 00), stopTimeMax=time(0, 20, 00),
         #                             description="CB được nghỉ tại đây 20 phút", flight_id='CB1',
         #                             airport_medium_id='3')
         # db.session.add(fam1)
         # db.session.commit()
 
-        # t1 = PlaneTicket(rank='2', price=1800000, place="Sân bay Nội bài", profile_id='1',
+        # t1 = PlaneTicket(rank='2', price=1800000, place="1", profile_id='1',
         #                  flight_id='CB1', seat_id='G1', user_id='2')
-        # t2 = PlaneTicket(rank='1', price=2000000, place="Sân bay Nội bài", profile_id='2',
+        # t2 = PlaneTicket(rank='1', price=2000000, place="1", profile_id='2',
         #                  flight_id='CB2', seat_id='G1', user_id='2')
-        # t3 = PlaneTicket(rank='1', price=1400000, place="Sân bay Phù Cát", profile_id='3',
+        # t3 = PlaneTicket(rank='1', price=1400000, place="3", profile_id='3',
         #                  flight_id='CB3', seat_id='G2', user_id='2')
         # db.session.add_all([t1, t2, t3])
         # db.session.commit()
 
-        g1 = Regulation(name='book_time', value='12:00:00',
-                        description='Thời gian đặt vé trước 12h lúc chuyến bay khởi hành')
-        g2 = Regulation(name='sale_time', value='4:00:00',
-                        description='Thời gian bán vé trước 4h lúc chuyến bay khởi hành')
-        g3 = Regulation(name='rank_1', value='300000',
-                        description='Vé hạng 1 phụ thu 300.000 VND')
-        db.session.add_all([g1, g2, g3])
-        db.session.commit()
-        pass
+        # g1 = Regulation(name='book_time', value='12:00:00',
+        #                 description='Thời gian đặt vé trước 12h lúc chuyến bay khởi hành')
+        # g2 = Regulation(name='sale_time', value='4:00:00',
+        #                 description='Thời gian bán vé trước 4h lúc chuyến bay khởi hành')
+        # g3 = Regulation(name='1', value='300000',
+        #                 description='Vé hạng 1 có đơn giá là 300.000 VND')
+        # g4 = Regulation(name='2', value='200000',
+        #                 description='Vé hạng 2 có đơn giá là 200.000 VND')
+        # db.session.add_all([g1, g2, g3, g4])
+        # db.session.commit()
+        # pass
