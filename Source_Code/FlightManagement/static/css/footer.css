@@ -1,7 +1,7 @@
 /* ------- footer -------- */
 
 footer {
-    background-image: url(/static/images/about_slide.jpg);
+    background-image: url("https://res.cloudinary.com/doaux2ndg/image/upload/v1670076219/FlightMangement/about_slide_rmux5j.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     height: 55%;
