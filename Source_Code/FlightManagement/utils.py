@@ -1,4 +1,4 @@
-from FlightManagement.models import User
+from FlightManagement.models import User, Flight
 from FlightManagement import db
 import hashlib
 
@@ -18,3 +18,9 @@ def register(name, username, password):
         u = User(name=name, username=username.strip(), password=password)
         db.session.add(u)
         db.session.commit()
+
+def load_flights():
+    return Flight.query.all()
+
+def get_flight_by_id(flight_id):
+    return Flight.query.get(flight_id)

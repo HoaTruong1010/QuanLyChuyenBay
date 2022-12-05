@@ -1,7 +1,9 @@
 from flask import render_template, request, redirect, url_for
+
 from FlightManagement import app, login, utils
 from FlightManagement.models import *
 from flask_login import login_user, logout_user
+from FlightManagement.admin import *
 
 
 @app.route("/")
@@ -18,6 +20,9 @@ def login_my_user():
         user = utils.check_login(username=username, password=password)
         if user:
             login_user(user=user)
+            if user.user_role == UserRole.ADMIN:
+                return redirect('/admin')
+
             return redirect(url_for("index"))
         else:
             err_msg = "ĐĂNG NHẬP THẤT BẠI!!!"

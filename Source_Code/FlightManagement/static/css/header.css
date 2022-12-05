@@ -49,7 +49,7 @@ a {
 /* --------header --------*/
 
 header {
-    background: url(/static/images/nhaTrang.jpg);
+    background: url('https://res.cloudinary.com/doaux2ndg/image/upload/v1670076220/FlightMangement/nhaTrang_lwglis.jpg');
     height: 100%;
     background-repeat: no-repeat;
     background-size: cover;
