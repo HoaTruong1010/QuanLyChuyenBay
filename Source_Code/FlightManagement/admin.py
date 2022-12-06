@@ -1,4 +1,4 @@
-from flask import redirect, url_for
+from flask import redirect, url_for, request
 from flask_admin import Admin, expose, BaseView
 from flask_login import current_user, logout_user
 from flask_wtf import FlaskForm
@@ -44,6 +44,7 @@ class RegulationView(AuthenticatedModelView):
 
 
 class Form(FlaskForm):
+    airports = SelectField('airports', choices=[])
     planes = SelectField('planes', choices=[])
     airlines = SelectField('airlines', choices=[])
 
@@ -63,10 +64,24 @@ class FlightManagementView(AuthenticatedModelView):
 
     @expose('/new/', methods=('GET', 'POST'))
     def create_view(self):
+        sts_msg = ''
         form = Form()
         form.planes.choices = [p.id for p in AirPlane.query.all()]
         form.airlines.choices = [a.name for a in AirLine.query.all()]
-        return self.render('admin/flight.html', form=form)
+        form.airports.choices = [ap.name for ap in AirPort.query.all()]
+
+        if request.method == "POST":
+            id = request.form['id']
+            name = request.form['name']
+            departing_at = request.form['departing_at']
+            arriving_at = request.form['arriving_at']
+            plane = form.planes.data
+            airline = form.airlines.data
+
+            sts_msg = utils.check_flight(id, name, departing_at, arriving_at, plane, airline)
+
+
+        return self.render('admin/flight.html', form=form, sts_msg=sts_msg)
 
 
 class StatsView(AuthenticatedView):

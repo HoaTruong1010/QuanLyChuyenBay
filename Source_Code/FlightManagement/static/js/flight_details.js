@@ -1,3 +1,0 @@
-function viewDetails(id) {
-    location.
-}
