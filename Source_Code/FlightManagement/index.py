@@ -1,5 +1,4 @@
 from flask import render_template, request, redirect, url_for
-
 from FlightManagement import app, login, utils
 from FlightManagement.models import *
 from flask_login import login_user, logout_user
@@ -55,7 +54,6 @@ def register():
             err_msg = 'Mật khẩu KHÔNG khớp!'
 
     return render_template('register.html', err_msg=err_msg)
-
 
 
 @login.user_loader

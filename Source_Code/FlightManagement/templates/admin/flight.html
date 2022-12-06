@@ -4,38 +4,45 @@
     {% if current_user.is_authenticated %}
         <form action="" method="POST" role="form" class="admin-form" enctype="multipart/form-data">
             <fieldset>
+                {% if sts_msg.__eq__("Lưu thành công") %}
+                    <div class="alert alert-success">
+                        {{ sts_msg }}
+                    </div>
+                {% else %}
+                    {% if sts_msg != '' %}
+                        <div class="alert alert-danger">
+                        {{ sts_msg }}
+                    </div>
+                    {% endif %}
+                {% endif %}
                 <div class="form-group ">
                     <label for="id" class="control-label">Mã chuyến bay
                         <strong style="color: red">*</strong>
                     </label>
                     <input class="form-control" id="id"
-                           maxlength="50" name="name" required="" type="text" value="">
+                           maxlength="50" name="id" required="" type="text" value="">
                 </div>
-
                 <div class="form-group ">
                     <label for="name" class="control-label">Tên chuyến bay
                         <strong style="color: red">*</strong>
                     </label>
                     <input class="form-control" id="name"
-                           maxlength="50" name="value" required="" type="text" value="">
+                           maxlength="50" name="name" required="" type="text" value="">
                 </div>
-
                 <div class="form-group ">
                     <label for="departing_at" class="control-label">Thời gian khởi hành
                         <strong style="color: red">*</strong>
                     </label>
                     <input class="form-control" id="departing_at"
-                           maxlength="50" name="value" required="" type="datetime-local" value="">
+                           maxlength="50" name="departing_at" required="" type="datetime-local" value="">
                 </div>
-
                 <div class="form-group ">
                     <label for="arriving_at" class="control-label">Thời gian đến
                         <strong style="color: red">*</strong>
                     </label>
                     <input class="form-control" id="arriving_at"
-                           maxlength="50" name="value" required="" type="datetime-local" value="">
+                           maxlength="50" name="arriving_at" required="" type="datetime-local" value="">
                 </div>
-
                 {{ form.csrf_token }}
                 <div class="form-group ">
                     <label class="control-label">Số hiệu máy bay
@@ -43,7 +50,6 @@
                     </label>
                     {{ form.planes(class="form-control") }}
                 </div>
-
                 {{ form.csrf_token }}
                 <div class="form-group ">
                     <label class="control-label">Tuyến bay
@@ -53,13 +59,120 @@
                 </div>
 
                 <hr>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="isMedium"
+                           id="flexSwitchCheckDefault" style="margin-left:0px">
+                    <label class="form-check-label" for="flexSwitchCheckDefault" style="margin-left:45px">Sân bay trung gian</label>
+                </div>
+                <div class="form-group ">
+                        <label class="control-label">Số lượng <strong style="color: red">*</strong>
+                        </label>
+                        <div id='choose'>
+                            <div class="form-check">
+                                <input class="form-check-input number" type="radio" value="1"
+                                name="flexRadioDefault" id="1" disabled>
+                                <label class="form-check-label" for="1">
+                                1
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input number" type="radio" value="2"
+                                 name="flexRadioDefault" id="2" disabled>
+                                <label class="form-check-label" for="2" >
+                                2
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                <div id="medium1">
+                    <hr>
+                    <div class="form-group ">
+                        <label for="name-stop" class="control-label">Tên trạm
+                            <strong style="color: red">*</strong>
+                        </label>
+                        <input class="form-control" id="name-stop"
+                               maxlength="50" name="name-stop" type="text" value="">
+                    </div>
+                    <div class="form-group ">
+                        <label for="time-stop-min" class="control-label">Thời gian dừng tối thiểu
+                            <strong style="color: red">*</strong>
+                        </label>
+                        <input class="form-control" id="time-stop-min"
+                               maxlength="50" name="time-stop-min" type="time" value="">
+                    </div>
+                    <div class="form-group ">
+                        <label for="time-stop-max" class="control-label">Thời gian dừng tối đa
+                            <strong style="color: red">*</strong>
+                        </label>
+                        <input class="form-control" id="time-stop-max"
+                               maxlength="50" name="time-stop-max" type="time" value="">
+                    </div>
+                    <div class="form-group ">
+                        <label for="description" class="control-label">Mô tả
+                            <strong style="color: red">*</strong>
+                        </label>
+                        <input class="form-control" id="description"
+                               maxlength="200" name="description" type="text" value="">
+                    </div>
+                    <div class="group-special">
+                        {{ form.csrf_token }}
+                        <div class="form-group">
+                            <label class="control-label">Sân bay dừng
+                                <strong style="color: red">*</strong>
+                            </label>
+                            {{ form.airports(class="form-control") }}
+                        </div>
+                    </div>
+                </div>
+
+                <div id="medium2">
+                    <hr>
+                    <div class="form-group ">
+                        <label for="name-stop2" class="control-label">Tên trạm
+                            <strong style="color: red">*</strong>
+                        </label>
+                        <input class="form-control" id="name-stop2"
+                               maxlength="50" name="name-stop2" type="text" value="">
+                    </div>
+                    <div class="form-group ">
+                        <label for="time-stop-min" class="control-label">Thời gian dừng tối thiểu
+                            <strong style="color: red">*</strong>
+                        </label>
+                        <input class="form-control" id="time-stop-min2"
+                               maxlength="50" name="time-stop-min" type="time" value="">
+                    </div>
+                    <div class="form-group ">
+                        <label for="time-stop-max2" class="control-label">Thời gian dừng tối đa
+                            <strong style="color: red">*</strong>
+                        </label>
+                        <input class="form-control" id="time-stop-max2"
+                               maxlength="50" name="time-stop-max2" type="time" value="">
+                    </div>
+                    <div class="form-group ">
+                        <label for="description2" class="control-label">Mô tả
+                            <strong style="color: red">*</strong>
+                        </label>
+                        <input class="form-control" id="description2"
+                               maxlength="200" name="description2" type="text" value="">
+                    </div>
+                    <div class="group-special">
+                        {{ form.csrf_token }}
+                        <div class="form-group">
+                            <label class="control-label">Sân bay dừng
+                                <strong style="color: red">*</strong>
+                            </label>
+                            {{ form.airports(class="form-control") }}
+                        </div>
+                    </div>
+                </div>
+
+
+                <hr>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10 submit-row">
                         <input type="submit" class="btn btn-primary" value="Lưu">
                         <input name="_add_another" type="submit" class="btn btn-secondary" value="Lưu và thêm cái khác">
-                        <input name="_continue_editing" type="submit" class="btn btn-secondary"
-                               value="Lưu và tiếp tục chỉnh sửa">
-                        <a href="/admin/regulation/" class="btn btn-danger" role="button">Hủy bỏ</a>
+                        <a href="/admin/flights/" class="btn btn-danger" role="button">Hủy bỏ</a>
                     </div>
                 </div>
             </fieldset>

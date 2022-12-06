@@ -1,4 +1,6 @@
-from FlightManagement.models import User, Flight
+from datetime import datetime
+
+from FlightManagement.models import User, Flight, Regulation
 from FlightManagement import db
 import hashlib
 
@@ -24,3 +26,29 @@ def load_flights():
 
 def get_flight_by_id(flight_id):
     return Flight.query.get(flight_id)
+
+def check_flight(id, name, departing_at, arriving_at, plane, airline):
+    if id and name and departing_at and arriving_at:
+        flight = Flight.query.filter(Flight.id.__eq__(id.strip())).first()
+        if flight:
+            return "Mã chuyến bay đã tồn tại"
+        else:
+            departing_at = datetime.strptime(departing_at, "%Y-%m-%dT%H:%M")
+            arriving_at = datetime.strptime(arriving_at, "%Y-%m-%dT%H:%M")
+            duration = arriving_at - departing_at
+            g1 = Regulation.query.filter(Regulation.name.__eq__("duration")).first()
+            if g1:
+                default_date = datetime(1900, 1, 1)
+                g1 = g1.get_value()
+                g1 = datetime.strptime(g1, "%H:%M:%S")
+                if (duration.total_seconds() > (g1 - default_date).total_seconds()):
+                    f = Flight(id=id, name=name,
+                               departing_at=departing_at, arriving_at=arriving_at,
+                               plane_id=plane, airline_id=airline)
+                    db.session.add(f)
+                    db.session.commit()
+                    return "Lưu thành công"
+                else:
+                    return str(duration.total_seconds())
+            else:
+                return "Hiện không có quy định về thời gian bay tối thiểu"

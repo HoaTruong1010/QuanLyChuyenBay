@@ -4,7 +4,7 @@ from FlightManagement import db, app
 from enum import Enum as UserEnum
 from flask_login import UserMixin
 import hashlib
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 # from flask_admin.contrib.sqla import  ModelView
 
 class UserRole(UserEnum):
@@ -165,12 +165,15 @@ class Regulation(db.Model):
     __tablename__ = 'regulations'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), nullable=False)
+    name = Column(String(50), nullable=False, unique=True)
     value = Column(String(50), nullable=False)
     description = Column(Text)
 
     def __str__(self):
         return str(self.id)
+
+    def get_value(self):
+        return self.value
 
 
 if __name__ == '__main__':
@@ -253,6 +256,8 @@ if __name__ == '__main__':
         #                 description='Vé hạng 1 có đơn giá là 300.000 VND')
         # g4 = Regulation(name='2', value='200000',
         #                 description='Vé hạng 2 có đơn giá là 200.000 VND')
-        # db.session.add_all([g1, g2, g3, g4])
+        # g5 = Regulation(name='duration', value='00:30:00',
+        #                 description='Vé hạng 2 có đơn giá là 200.000 VND')
+        # db.session.add_all([g1, g2, g3, g4, g5])
         # db.session.commit()
         pass
