@@ -123,8 +123,8 @@ class Flight_AirportMedium(db.Model):
     __tablename__ = 'flight_airport_mediums'
 
     name = Column(String(50), nullable=False)
-    stopTimeMin = Column(Time, nullable=False)
-    stopTimeMax = Column(Time, nullable=False)
+    stopTimeMin = Column(DateTime, nullable=False)
+    stopTimeMax = Column(DateTime, nullable=False)
     description = Column(Text)
 
     flight_id = (Column(String(10), ForeignKey(Flight.id), primary_key=True))
@@ -179,7 +179,7 @@ class Regulation(db.Model):
 if __name__ == '__main__':
     with app.app_context():
         # db.drop_all()
-        # db.create_all()
+        db.create_all()
 
         # password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
         # u1 = User(name='An', username='an1100', password=password,
@@ -233,7 +233,8 @@ if __name__ == '__main__':
         # db.session.add_all([f1, f2, f3])
         # db.session.commit()
 
-        # fam1 = Flight_AirportMedium(name='Tram dung 1', stopTimeMin=time(0, 20, 00), stopTimeMax=time(0, 20, 00),
+        # fam1 = Flight_AirportMedium(name='Tram dung 1', stopTimeMin=datetime(2022, 12, 1, 13, 10, 00),
+        #                             stopTimeMax=datetime(2022, 12, 1, 13, 35, 00),
         #                             description="CB được nghỉ tại đây 20 phút", flight_id='CB1',
         #                             airport_medium_id='3')
         # db.session.add(fam1)
@@ -257,7 +258,11 @@ if __name__ == '__main__':
         # g4 = Regulation(name='2', value='200000',
         #                 description='Vé hạng 2 có đơn giá là 200.000 VND')
         # g5 = Regulation(name='duration', value='00:30:00',
-        #                 description='Vé hạng 2 có đơn giá là 200.000 VND')
-        # db.session.add_all([g1, g2, g3, g4, g5])
+        #                 description='Thời gian bay tối thiểu là 30 phút')
+        # g6 = Regulation(name='min_stop', value='00:20:00',
+        #                 description='Thời gian máy bay được dừng tối thiểu 20 phút')
+        # g7 = Regulation(name='max_stop', value='00:30:00',
+        #                 description='Thời gian máy bay được dừng tối đa 30 phút')
+        # db.session.add_all([g1, g2, g3, g4, g5, g6, g7])
         # db.session.commit()
         pass

@@ -3,9 +3,9 @@ $(document).ready(function() {
 
     $('input[type=checkbox][name=isMedium]').on('change', function() {
         if ($(this).is(":checked"))
-            $('input[type=radio][name=flexRadioDefault]').removeAttr("disabled")
+            $('input[type=radio][name=number]').removeAttr("disabled")
         else {
-            $('input[type=radio][name=flexRadioDefault]').prop({
+            $('input[type=radio][name=number]').prop({
                 "checked": false,
                 "disabled": true
             })
