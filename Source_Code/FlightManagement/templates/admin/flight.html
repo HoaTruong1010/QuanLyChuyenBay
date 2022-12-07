@@ -4,14 +4,18 @@
     {% if current_user.is_authenticated %}
         <form action="" method="POST" role="form" class="admin-form" enctype="multipart/form-data">
             <fieldset>
-                {% if sts_msg.__eq__("Lưu thành công") %}
-                    <div class="alert alert-success">
-                        {{ sts_msg }}
+                {% if sts_msg.__eq__("success") %}
+                    {% if am_msg1.__eq__("success") or am_msg1.__eq__("")%}
+                        {% if am_msg2.__eq__("success") or am_msg2.__eq__("")%}
+                            <div class="alert alert-success">
+                        Lưu thành công!
                     </div>
+                        {% endif %}
+                    {% endif %}
                 {% else %}
                     {% if sts_msg != '' %}
                         <div class="alert alert-danger">
-                        {{ sts_msg }}
+                        {{ sts_msg }}, {{ am_msg1 }}, {{ am_msg2 }}
                     </div>
                     {% endif %}
                 {% endif %}
@@ -69,15 +73,15 @@
                         </label>
                         <div id='choose'>
                             <div class="form-check">
-                                <input class="form-check-input number" type="radio" value="1"
-                                name="flexRadioDefault" id="1" disabled>
+                                <input class="form-check-input" type="radio" value="1"
+                                name="number" id="1" disabled>
                                 <label class="form-check-label" for="1">
                                 1
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input number" type="radio" value="2"
-                                 name="flexRadioDefault" id="2" disabled>
+                                <input class="form-check-input" type="radio" value="2"
+                                 name="number" id="2" disabled>
                                 <label class="form-check-label" for="2" >
                                 2
                                 </label>
@@ -94,18 +98,18 @@
                                maxlength="50" name="name-stop" type="text" value="">
                     </div>
                     <div class="form-group ">
-                        <label for="time-stop-min" class="control-label">Thời gian dừng tối thiểu
+                        <label for="time-stop-min" class="control-label">Thời gian bắt đầu dừng
                             <strong style="color: red">*</strong>
                         </label>
                         <input class="form-control" id="time-stop-min"
-                               maxlength="50" name="time-stop-min" type="time" value="">
+                               maxlength="50" name="time-stop-min" type="datetime-local" value="">
                     </div>
                     <div class="form-group ">
-                        <label for="time-stop-max" class="control-label">Thời gian dừng tối đa
+                        <label for="time-stop-max" class="control-label">Thời gian dừng kết thúc
                             <strong style="color: red">*</strong>
                         </label>
                         <input class="form-control" id="time-stop-max"
-                               maxlength="50" name="time-stop-max" type="time" value="">
+                               maxlength="50" name="time-stop-max" type="datetime-local" value="">
                     </div>
                     <div class="form-group ">
                         <label for="description" class="control-label">Mô tả
@@ -161,7 +165,7 @@
                             <label class="control-label">Sân bay dừng
                                 <strong style="color: red">*</strong>
                             </label>
-                            {{ form.airports(class="form-control") }}
+                            {{ form.airports2(class="form-control") }}
                         </div>
                     </div>
                 </div>
