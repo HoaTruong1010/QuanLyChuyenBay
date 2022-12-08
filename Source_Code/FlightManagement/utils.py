@@ -1,7 +1,9 @@
-from datetime import datetime
 from FlightManagement.models import *
 from FlightManagement import db
+
 import hashlib
+from datetime import datetime
+
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
@@ -20,8 +22,8 @@ def register(name, username, password):
         db.session.add(u)
         db.session.commit()
 
-def load_flights():
-    return Flight.query.all()
+def load_airports():
+    return AirPort.query.all()
 
 
 def take_time(str_date, format):
@@ -29,6 +31,7 @@ def take_time(str_date, format):
     date = datetime.strptime(str_date, format)
     time = date - default_date
     return time
+
 
 def get_regulation_time_by_id(id):
     date = Regulation.query.get(id)
@@ -62,7 +65,7 @@ def check_flight(id, name, departing_at, arriving_at, plane):
                 msg = "Hiện không có quy định về thời gian bay tối thiểu"
         return msg
 
-def add_flight(id, name, departing_at, arriving_at, plane, airline):
+def save_flight(id, name, departing_at, arriving_at, plane, airline):
     al_id = AirLine.query.filter(AirLine.name.__eq__(airline)).first()
     f = Flight(id=id, name=name,
                departing_at=departing_at, arriving_at=arriving_at,
@@ -108,11 +111,11 @@ def check_airport_medium(name, min_stop, max_stop, airline, stop_airport, flight
         check_am_msg = 'Thông tin chưa được điền đầy đủ'
     return check_am_msg
 
-def add_airport_medium(name, min_stop, max_stop, description, flight_id, airport):
+def save_airport_medium(name, min_stop, max_stop, description, flight_id, airport):
     ap = AirPort.query.filter(AirPort.name.__eq__(airport)).first()
     min_stop = datetime.strptime(min_stop, "%Y-%m-%dT%H:%M")
     max_stop = datetime.strptime(max_stop, "%Y-%m-%dT%H:%M")
-    apm = Flight_AirportMedium(name=name, stopTimeMin=min_stop, stopTimeMax=max_stop,
+    apm = Flight_AirportMedium(name=name, stop_time_begin=min_stop, stop_time_finish=max_stop,
                description=description, flight_id=flight_id, airport_medium_id=ap.id)
     db.session.add(apm)
     db.session.commit()

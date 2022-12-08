@@ -1,59 +1,13 @@
-from flask import render_template, request, redirect, url_for
-from FlightManagement import app, login, utils
-from FlightManagement.models import *
-from flask_login import login_user, logout_user
 from FlightManagement.admin import *
+from FlightManagement import app, login, utils, controllers
 
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+app.add_url_rule('/', 'index', controllers.index)
+app.add_url_rule('/', 'login', controllers.login_my_user, methods=['get','post'])
+app.add_url_rule('/logout', 'logout', controllers.login_my_user)
+app.add_url_rule('/register', 'register', controllers.register, methods=['get', 'post'])
+app.add_url_rule('/api/airport_info', 'add-flight', controllers.airports)
 
-
-@app.route("/", methods=['get','post'])
-def login_my_user():
-    if request.method == "POST":
-        username = request.form['username']
-        password = request.form['password']
-
-        user = utils.check_login(username=username, password=password)
-        if user:
-            login_user(user=user)
-            if user.user_role == UserRole.ADMIN:
-                return redirect('/admin')
-
-            return redirect(url_for("index"))
-        else:
-            err_msg = "ĐĂNG NHẬP THẤT BẠI!!!"
-
-    return render_template("index.html", err_msg=err_msg)
-
-
-@app.route('/logout')
-def logout_my_user():
-    logout_user()
-    return redirect(url_for("index"))
-
-
-@app.route('/register', methods=['get', 'post'])
-def register():
-    err_msg = ''
-    if request.method == 'POST':
-        password = request.form['password']
-        confirm = request.form['confirm']
-        if password.__eq__(confirm):
-            try:
-                utils.register(name=request.form['name'],
-                             password=password,
-                             username=request.form['username'])
-
-                return redirect('/')
-            except:
-                err_msg = 'Đã có lỗi xảy ra! Vui lòng quay lại sau!'
-        else:
-            err_msg = 'Mật khẩu KHÔNG khớp!'
-
-    return render_template('register.html', err_msg=err_msg)
 
 
 @login.user_loader
