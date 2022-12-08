@@ -1,6 +1,5 @@
-from flask import session
-from FlightManagement import app, login, utils, controllers
 from FlightManagement.admin import *
+from FlightManagement import app, login, utils, controllers
 
 
 app.add_url_rule('/', 'index', controllers.index)

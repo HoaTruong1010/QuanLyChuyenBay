@@ -86,44 +86,45 @@ class FlightManagementView(AuthenticatedModelView):
                 except:
                     sts_msg = 'Đã có lỗi xảy ra khi lưu chuyến bay! Vui lòng quay lại sau!'
 
-            try:
-                is_apm = request.form['isMedium']
+                try:
+                    is_apm = request.form['isMedium']
 
-                if is_apm == 'on':
-                    am_number = request.form['number']
-                    num = int(am_number)
-                    for i in range(num):
-                        str_name = "name-stop-" + str(i)
-                        str_stb = "stop-time-begin-" + str(i)
-                        str_stf = "stop-time-finish-" + str(i)
-                        str_des = "description-" + str(i)
-                        str_ap = "form-select-" + str(i)
+                    if is_apm == 'on':
+                        am_number = request.form['number']
+                        num = int(am_number)
+                        for i in range(num):
+                            str_name = "name-stop-" + str(i)
+                            str_stb = "stop-time-begin-" + str(i)
+                            str_stf = "stop-time-finish-" + str(i)
+                            str_des = "description-" + str(i)
+                            str_ap = "form-select-" + str(i)
 
-                        am_name = request.form[str_name]
-                        am_stb = request.form[str_stb]
-                        am_stf = request.form[str_stf]
-                        am_des = request.form[str_des]
-                        am_ap = request.form[str_ap]
-                        am_msg = utils.check_airport_medium(am_name, am_stb,
-                                                             am_stf, airline, am_ap, id)
-                        if am_msg == 'success':
-                            try:
-                                utils.save_airport_medium(am_name, am_stb,
-                                                         am_stf, am_des,
-                                                         id, am_ap)
-                            except:
+                            am_name = request.form[str_name]
+                            am_stb = request.form[str_stb]
+                            am_stf = request.form[str_stf]
+                            am_des = request.form[str_des]
+                            am_ap = request.form[str_ap]
+                            am_msg = utils.check_airport_medium(am_name, am_stb,
+                                                                 am_stf, airline, am_ap, id)
+                            if am_msg == 'success':
+                                try:
+                                    utils.save_airport_medium(am_name, am_stb,
+                                                             am_stf, am_des,
+                                                             id, am_ap)
+                                except:
+                                    f = Flight.query.get(id)
+                                    db.session.delete(f)
+                                    db.session.commit()
+                                    am_msg = 'Đã có lỗi xảy ra khi lưu sân bay trung gian! Vui lòng quay lại sau!'
+                            else:
                                 f = Flight.query.get(id)
                                 db.session.delete(f)
                                 db.session.commit()
-                                am_msg = 'Đã có lỗi xảy ra khi lưu sân bay trung gian! Vui lòng quay lại sau!'
-                        else:
-                            f = Flight.query.get(id)
-                            db.session.delete(f)
-                            db.session.commit()
-                else:
-                    sts_msg = 'Không có số lượng sân bay trung gian'
-            except:
-                sts_msg = "success"
+                                am_msg = am_msg
+                    else:
+                        sts_msg = 'Không có số lượng sân bay trung gian'
+                except:
+                    sts_msg = "success"
 
 
 
