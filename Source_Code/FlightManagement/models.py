@@ -1,11 +1,10 @@
-from sqlalchemy import Column, Integer, String, Boolean, DECIMAL, ForeignKey, DateTime, Enum, Time, Text
+from sqlalchemy import Column, Integer, String, Boolean, DECIMAL, ForeignKey, DateTime, Enum, Text
 from sqlalchemy.orm import relationship
 from FlightManagement import db, app
 from enum import Enum as UserEnum
 from flask_login import UserMixin
 import hashlib
 from datetime import datetime, time, timedelta
-# from flask_admin.contrib.sqla import  ModelView
 
 class UserRole(UserEnum):
     USER = 1
@@ -66,8 +65,9 @@ class Seat(db.Model):
     name = Column(String(50), nullable=False)
     status = Column(Boolean, default=False)
 
-    plane_id = Column(String(10), ForeignKey(AirPlane.id), nullable=False)
-    plans = relationship("AirPlane", foreign_keys=[plane_id])
+    plane_id = Column(String(10), ForeignKey(AirPlane.id, ondelete="CASCADE"), nullable=False)
+    planes = relationship("AirPlane", foreign_keys=[plane_id], lazy=True,
+                           passive_deletes = True, cascade="all, delete")
 
     def __str__(self):
         return str(self.id)
@@ -82,7 +82,7 @@ class AirPort(db.Model):
 
 
     def __str__(self):
-        return str(self.id)
+        return str(self.name)
 
 
 class AirLine(db.Model):
@@ -91,14 +91,16 @@ class AirLine(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(100), nullable=False)
 
-    from_airport_id = Column(Integer, ForeignKey(AirPort.id),nullable=False)
-    to_airport_id = Column(Integer, ForeignKey(AirPort.id), nullable=False)
+    from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"),nullable=False)
+    to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
 
-    from_airport = relationship("AirPort", foreign_keys=[from_airport_id])
-    to_airport = relationship("AirPort", foreign_keys=[to_airport_id])
+    from_airport = relationship("AirPort", foreign_keys=[from_airport_id], lazy=True,
+                           passive_deletes = True, cascade="all, delete")
+    to_airport = relationship("AirPort", foreign_keys=[to_airport_id], lazy=True,
+                           passive_deletes = True, cascade="all, delete")
 
     def __str__(self):
-        return str(self.id)
+        return str(self.name)
 
 
 class Flight(db.Model):
@@ -109,29 +111,33 @@ class Flight(db.Model):
     departing_at = Column(DateTime, nullable=False)
     arriving_at = Column(DateTime, nullable=False)
 
-    plane_id = (Column(String(10), ForeignKey(AirPlane.id), nullable=False))
-    airline_id = (Column(String(10), ForeignKey(AirLine.id), nullable=False))
-    planes = relationship("AirPlane", foreign_keys=[plane_id])
-    airlines = relationship("AirLine", foreign_keys=[airline_id])
+    plane_id = (Column(String(10), ForeignKey(AirPlane.id, ondelete="CASCADE"), nullable=False))
+    airline_id = (Column(String(10), ForeignKey(AirLine.id, ondelete="CASCADE"), nullable=False))
+    planes = relationship("AirPlane", foreign_keys=[plane_id], lazy=True,
+                           passive_deletes = True, cascade="all, delete")
+    airlines = relationship("AirLine", foreign_keys=[airline_id], lazy=True,
+                           passive_deletes = True, cascade="all, delete")
 
 
     def __str__(self):
-        return str(self.id)
+        return str(self.name)
 
 
 class Flight_AirportMedium(db.Model):
     __tablename__ = 'flight_airport_mediums'
 
     name = Column(String(50), nullable=False)
-    stopTimeMin = Column(DateTime, nullable=False)
-    stopTimeMax = Column(DateTime, nullable=False)
+    stop_time_begin = Column(DateTime, nullable=False)
+    stop_time_finish = Column(DateTime, nullable=False)
     description = Column(Text)
 
-    flight_id = (Column(String(10), ForeignKey(Flight.id), primary_key=True))
-    airport_medium_id = (Column(Integer, ForeignKey(AirPort.id), primary_key=True))
+    flight_id = Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE"), primary_key=True)
+    airport_medium_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), primary_key=True)
 
-    flights = relationship("Flight", foreign_keys=[flight_id])
-    aiports = relationship("AirPort", foreign_keys=[airport_medium_id])
+    flights = relationship("Flight", foreign_keys=[flight_id], lazy=True,
+                           passive_deletes = True, cascade="all, delete")
+    aiports = relationship("AirPort", foreign_keys=[airport_medium_id], lazy=True,
+                           passive_deletes = True, cascade="all, delete")
 
     def __str__(self):
         return str(self.name)
@@ -145,17 +151,22 @@ class PlaneTicket(db.Model):
     price = Column(DECIMAL(18,2), nullable=False)
     date = Column(DateTime, default=datetime.now())
 
-    place = Column(Integer, ForeignKey(AirPort.id), nullable=False)
-    profile_id = (Column(Integer, ForeignKey(Profile.serial), nullable=False))
-    flight_id = (Column(String(10), ForeignKey(Flight.id), nullable=False))
-    seat_id = (Column(String(10), ForeignKey(Seat.id), nullable=False))
-    user_id = (Column(Integer, ForeignKey(User.id), nullable=True))
+    place = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
+    profile_id = (Column(Integer, ForeignKey(Profile.serial, ondelete="CASCADE"), nullable=False))
+    flight_id = (Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE"), nullable=False))
+    seat_id = (Column(String(10), ForeignKey(Seat.id, ondelete="CASCADE"), nullable=False))
+    user_id = (Column(Integer, ForeignKey(User.id, ondelete="CASCADE"), nullable=True))
 
-    places = relationship("AirPort", foreign_keys=[place])
-    profiles = relationship("Profile", foreign_keys=[profile_id])
-    flights = relationship("Flight", foreign_keys=[flight_id])
-    seats = relationship("Seat", foreign_keys=[seat_id])
-    users = relationship("User", foreign_keys=[user_id])
+    places = relationship("AirPort", foreign_keys=[place], lazy=True,
+                           cascade = "all, delete", passive_deletes = True)
+    profiles = relationship("Profile", foreign_keys=[profile_id], lazy=True,
+                           cascade = "all, delete", passive_deletes = True)
+    flights = relationship("Flight", foreign_keys=[flight_id], lazy=True,
+                           cascade = "all, delete", passive_deletes = True)
+    seats = relationship("Seat", foreign_keys=[seat_id], lazy=True,
+                           cascade = "all, delete", passive_deletes = True)
+    users = relationship("User", foreign_keys=[user_id], lazy=True,
+                           cascade = "all, delete", passive_deletes = True)
 
     def __str__(self):
         return str(self.id)
@@ -179,7 +190,7 @@ class Regulation(db.Model):
 if __name__ == '__main__':
     with app.app_context():
         # db.drop_all()
-        db.create_all()
+        # db.create_all()
 
         # password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
         # u1 = User(name='An', username='an1100', password=password,
@@ -190,7 +201,7 @@ if __name__ == '__main__':
         #           user_role=UserRole.ADMIN)
         # db.session.add_all([u1, u2, u3])
         # db.session.commit()
-
+        #
         # p1 = Profile(id='01231', name='Nguyen Van An', gender='nam', dob=datetime(2002,1,1), email='an1100@gmail.com',
         #              phone='0176448394')
         # p2 = Profile(id='01232', name='Le Thi Binh', gender='nu', dob=datetime(2001, 11, 6), email='binh1211@gmail.com',
@@ -199,31 +210,32 @@ if __name__ == '__main__':
         #              phone='0176470094', isSupervisor=True)
         # db.session.add_all([p1, p2, p3])
         # db.session.commit()
-
+        #
         # pl1 = AirPlane(id='MB1', name='May bay 1', manufacturer='VN AirLine', totalSeat=60)
         # pl2 = AirPlane(id='MB2', name='May bay 2', manufacturer='VN AirLine', totalSeat=70)
         # pl3 = AirPlane(id='MB3', name='May bay 3', manufacturer='VN AirLine', totalSeat=65)
         # db.session.add_all([pl1, pl2, pl3])
         # db.session.commit()
-
+        #
         # s1 = Seat(id='G1', name='Ghế 1', plane_id='MB1')
         # s2 = Seat(id='G2', name='Ghế 2', plane_id='MB2')
         # s3 = Seat(id='G3', name='Ghế 3', plane_id='MB3')
         # db.session.add_all([s1, s2, s3])
         # db.session.commit()
-
+        #
         # sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội')
         # sb2 = AirPort(name='Sân bay Tân Sơn Nhất', location='Hồ Chí Minh')
         # sb3 = AirPort(name='Sân bay Phù Cát', location='Bình Định')
-        # db.session.add_all([sb1, sb2, sb3])
+        # sb4 = AirPort(name='Sân bay Cát Bi', location='Hải Phòng')
+        # db.session.add_all([sb1, sb2, sb3, sb4])
         # db.session.commit()
-
+        #
         # al1 = AirLine(id='1', name='Hà Nội - Hồ Chí Minh', from_airport_id='1', to_airport_id='2')
         # al2 = AirLine(id='2', name='Hà Nội - Bình Định', from_airport_id='1', to_airport_id='3')
         # al3 = AirLine(id='3', name='Bình Định - Hồ Chí Minh', from_airport_id='3', to_airport_id='2')
         # db.session.add_all([al1, al2, al3])
         # db.session.commit()
-
+        #
         # f1 = Flight(id='CB1', name='Chuyến bay 001', departing_at=datetime(2022, 12, 1, 13, 00, 00),
         #             arriving_at=datetime(2022, 12, 1, 14, 00, 00), plane_id='MB1', airline_id='1')
         # f2 = Flight(id='CB2', name='Chuyến bay 002', departing_at=datetime(2022, 12, 1, 18, 00, 00),
@@ -232,14 +244,14 @@ if __name__ == '__main__':
         #             arriving_at=datetime(2022, 12, 1, 9, 50, 00), plane_id='MB3', airline_id='3')
         # db.session.add_all([f1, f2, f3])
         # db.session.commit()
-
-        # fam1 = Flight_AirportMedium(name='Tram dung 1', stopTimeMin=datetime(2022, 12, 1, 13, 10, 00),
-        #                             stopTimeMax=datetime(2022, 12, 1, 13, 35, 00),
+        #
+        # fam1 = Flight_AirportMedium(name='Tram dung 1', stop_time_begin=datetime(2022, 12, 1, 13, 10, 00),
+        #                             stop_time_finish=datetime(2022, 12, 1, 13, 35, 00),
         #                             description="CB được nghỉ tại đây 20 phút", flight_id='CB1',
         #                             airport_medium_id='3')
         # db.session.add(fam1)
         # db.session.commit()
-
+        #
         # t1 = PlaneTicket(rank='2', price=1800000, place="1", profile_id='1',
         #                  flight_id='CB1', seat_id='G1', user_id='2')
         # t2 = PlaneTicket(rank='1', price=2000000, place="1", profile_id='2',
@@ -248,7 +260,7 @@ if __name__ == '__main__':
         #                  flight_id='CB3', seat_id='G2', user_id='2')
         # db.session.add_all([t1, t2, t3])
         # db.session.commit()
-
+        #
         # g1 = Regulation(name='book_time', value='12:00:00',
         #                 description='Thời gian đặt vé trước 12h lúc chuyến bay khởi hành')
         # g2 = Regulation(name='sale_time', value='4:00:00',
@@ -264,5 +276,9 @@ if __name__ == '__main__':
         # g7 = Regulation(name='max_stop', value='00:30:00',
         #                 description='Thời gian máy bay được dừng tối đa 30 phút')
         # db.session.add_all([g1, g2, g3, g4, g5, g6, g7])
+        # db.session.commit()
+
+        # fam = Flight_AirportMedium.query.filter(Flight_AirportMedium.flight_id.__eq__("CB1")).first()
+        # db.session.delete(fam)
         # db.session.commit()
         pass
