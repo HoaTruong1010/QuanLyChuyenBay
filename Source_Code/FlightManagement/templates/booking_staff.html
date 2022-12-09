@@ -2,82 +2,148 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-<div class="booking-content">
-    <span class="content-header">
-       Lên lịch đặt ngay một chiếc vé ưng ý nào
-    </span>
+<section class="booking">
+    <div class="booking-content">
+        <form method="post" class="booking-ticket_for_staff">
+            <div class="header-content">
+                <h1>ĐẶT VÉ MÁY BAY CHO KHÁCH</h1>
+            </div>
 
 
-    <!-- The Modal -->
-    <div class="flex type">
+            <div class="booking-form">
+                <div class="flex">
+                    <div class="booking-form">
+<!--                        Thong tin ve may bay-->
+                        <div class="subHeader">
+                            <span>
+                                Thông tin cần thiết khi đặt vé máy bay
+                            </span>
+                        </div>
 
-        <div>
-            <label for="rank">Hạng vé</label>
-            <select name="rank" id="rank">
-                <option value="1">Hạng 1</option>
-                <option value="2">Hạng 2</option>
-            </select>
-        </div>
-    </div>
+                        <div class="flex type-ticket">
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="khuhoi" name="inlineRadioOptions"
+                                   value="khứ hồi" checked>Khứ hồi
+                                <label class="form-check-label" for="khuhoi"></label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="motchieu" name="inlineRadioOptions"
+                                   value="một chiều">Một chiều
+                                <label class="form-check-label" for="motchieu"></label>
+                            </div>
 
-    <!-- Tab panes -->
+                            <div>
+                                <label for="rank">Hạng vé</label>
+                                <select name="rank" id="rank">
+                                    <option value="1">Hạng 1</option>
+                                    <option value="2">Hạng 2</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+<!--                        <div>-->
+<!--                            <span>Hạng vé</span>-->
+<!--                            <input type="text" required name="rank" placeholder="Chọn hạng vé...">-->
+<!--                        </div>-->
+                            <div class="place">
+                                <span>Từ</span>
+                                <input type="text" class="form-control" list="f_airports" name="from"
+                                   placeholder="Chọn nơi đi...">
+                                <datalist id="f_airports">
+                                    {% for a in airports %}
+                                        <option value="{{ a.location }}">
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                            <div class="place">
+                                <span>Đến</span>
+                                <input type="text" class="form-control" list="t_airports" name="to"
+                                   placeholder="Chọn nơi đến...">
+                                <datalist id="t_airports">
+                                    {% for a in airports %}
+                                        <option value="{{ a.location }}">
+                                    {% endfor %}
+                                </datalist>
+                            </div>
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-md-6">
+                                    <span>Ngày khởi hành</span>
+                                    <input type="date" id="from_date" name="from_date" class="form-control" style="width: 100%">
+                                </div>
+                                <div class="col-md-6">
+                                    <span>Ngày về</span>
+                                    <input type="date" id="to_date" name="to_date" class="form-control" style="width: 100%">
+                                </div>
+                            </div>
 
-            <div class="form-group">
-                <div class="place">
-                    <form action="/">
-                        <label for="fromairport">
-                         <span>Từ</span>
-                        </label>
-                        <input type="text" class="form-control" list="airports" name="from" id="fromairport"
-                           placeholder="Chọn nơi đi...">
-
-                        <datalist id="airports">
-                            {% for a in airports %}
-                                <option value="{{ a.name }}">
-                            {% endfor %}
-                        </datalist>
-                    </form>
-                </div>
-                <div class="place">
-                    <span>Đến</span>
-                    <input type="text" class="form-control"  required name="to" placeholder="Chọn nơi đến...">
-                </div>
-                <div class="row" style="margin-bottom: 10px;">
-                    <div class="col-md-6">
-                        <span>Ngày khởi hành</span>
-                        <input type="date" name="from_date" class="form-control" style="width: 100%">
-                    </div>
-                    <div class="col-md-6">
-                        <span>Ngày về</span>
-                        <input type="date" name="to_date" class="form-control" style="width: 100%">
-                    </div>
-                </div>
-
-                <div class="row" style="margin-bottom: 10px;">
-                    <div class="col-md-4">
-                        <span>Người lớn</span>
-                        <input type="number" class="form-control"
+                            <div class="row" style="margin-bottom: 10px;">
+                                <div class="col-md-4">
+                                    <span>Người lớn</span>
+                                    <input type="number" class="form-control"
                                        value="1" min="0" max="10" step="1" style="width: 100%"/>
-                    </div>
-                    <div class="col-md-4">
-                        <span>Trẻ em</span>
-                        <span class="sub-header">(2-12 tuổi)</span>
-                        <input type="number" class="form-control"
+                                </div>
+                                <div class="col-md-4">
+                                    <span>Trẻ em</span>
+                                    <span class="sub-header">(2-12 tuổi)</span>
+                                    <input type="number" class="form-control"
                                        value="0" min="0" max="10" step="1" style="width: 100%"/>
-                    </div>
-                    <div class="col-md-4">
-                        <span>Em bé</span>
-                        <span class="sub-header">(< 2 tuổi)</span>
-                        <input type="number" class="form-control"
+                                </div>
+                                <div class="col-md-4">
+                                    <span>Em bé</span>
+                                    <span class="sub-header">(< 2 tuổi)</span>
+                                    <input type="number" class="form-control"
                                        value="0" min="0" max="10" step="1" style="width: 100%"/>
+                                </div>
+                            </div>
+
+                            <div class="httt">
+                                <span>Hình thức thanh toán</span>
+                                <br>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" id="tienmat" name="inlineRadioOptions"
+                                            value="Tiền mặt" checked>Thanh toán tiền mặt
+                                    <label class="form-check-label" for="tienmat"></label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" id="visa" name="inlineRadioOptions"
+                                        value="VISA">Thanh toán VISA
+                                    <label class="form-check-label" for="visa"></label>
+                                </div>
+                            </div>
+                        </div>
+<!--                        Thong tin khach hang-->
+                        <div class="subHeader">
+                            <span>Thông tin khách hàng</span>
+                        </div>
+
+                        <div class="form-group">
+                            <div>
+                                <span>Họ và tên khách hàng</span>
+                                <input type="text" required name="name" placeholder="Nhập tên khách hàng...">
+                            </div>
+                            <div>
+                                <span>Ngày tháng năm sinh</span>
+                                <input type="date" id="bday" name="birthday" class="form-control" style="width: 100%">
+                            </div>
+                            <div>
+                                <span>Điện thoại</span>
+                                <input type="text" required name="sdt" placeholder="Nhập số điện thoại...">
+                            </div>
+                            <div>
+                                <span>Email</span>
+                                <input type="text" id="mail" required name="email" placeholder="Nhập email...">
+                            </div>
+
+                            <div class="bt">
+                                <input type="submit" value="Tìến hành đặt vé"/>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="bt">
-                <div class="bt">
-                    <input type="submit" value="Tìm chuyến bay"/>
                 </div>
             </div>
 
-</div>
+
+        </form>
+    </div>
+</section>
 {% endblock %}

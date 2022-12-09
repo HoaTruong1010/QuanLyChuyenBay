@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/content.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/booking_staff.css') }}">
 
     <link href="datepicker/css/bootstrap.min.css" rel="stylesheet" />
     <link href="datepicker/css/datepicker.css" rel="stylesheet" />
@@ -48,33 +48,33 @@
     {% endblock %}
 
 
-    <script>
-        $(function () {
-            'use strict';
-            var nowTemp = new Date();
-            var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+<!--    <script>-->
+<!--        $(function () {-->
+<!--            'use strict';-->
+<!--            var nowTemp = new Date();-->
+<!--            var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);-->
 
-            var start = $('#from_date').datepicker({
-                onRender: function (date) {
-                    return date.valueOf() < now.valueOf() ? 'disabled' : '';
-                }
-            }).on('changeDate', function (ev) {
-                if (ev.date.valueOf() > end.date.valueOf()) {
-                    var newDate = new Date(ev.date)
-                    newDate.setDate(newDate.getDate() + 1);
-                    checkout.setValue(newDate);
-                }
-                start.hide();
-                $('#to_date')[0].focus();
-            }).data('datepicker');
-            var end = $('#to_date').datepicker({
-                onRender: function (date) {
-                    return date.valueOf() <= start.date.valueOf() ? 'disabled' : '';
-                }
-            }).on('changeDate', function (ev) {
-                end.hide();
-            }).data('datepicker');
-        });
-    </script>
+<!--            var start = $('#from_date').datepicker({-->
+<!--                onRender: function (date) {-->
+<!--                    return date.valueOf() < now.valueOf() ? 'disabled' : '';-->
+<!--                }-->
+<!--            }).on('changeDate', function (ev) {-->
+<!--                if (ev.date.valueOf() > end.date.valueOf()) {-->
+<!--                    var newDate = new Date(ev.date)-->
+<!--                    newDate.setDate(newDate.getDate() + 1);-->
+<!--                    checkout.setValue(newDate);-->
+<!--                }-->
+<!--                start.hide();-->
+<!--                $('#to_date')[0].focus();-->
+<!--            }).data('datepicker');-->
+<!--            var end = $('#to_date').datepicker({-->
+<!--                onRender: function (date) {-->
+<!--                    return date.valueOf() <= start.date.valueOf() ? 'disabled' : '';-->
+<!--                }-->
+<!--            }).on('changeDate', function (ev) {-->
+<!--                end.hide();-->
+<!--            }).data('datepicker');-->
+<!--        });-->
+<!--    </script>-->
 </body>
 </html>

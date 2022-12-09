@@ -10,7 +10,7 @@ def index():
     from_airports = dao.load_from_airlines(airport_id=request.args.get("airport_id"),
                                            kw=request.args.get('keyword'))
     to_airports = dao.load_to_airlines(airport_id=request.args.get("airport_id"),
-                                           kw=request.args.get("keyword"))
+                                       kw=request.args.get("keyword"))
     tickets = dao.load_tickets()
     return render_template('index.html', airports=airports, from_airports=from_airports, to_airports=to_airports,
                            tickets=tickets)
@@ -27,15 +27,46 @@ def login_admin():
     return redirect('/admin')
 
 
+def login_staff():
+    username = request.form['username']
+    password = request.form['password']
+
+    user = dao.auth_user(username=username, password=password)
+    if user:
+        login_user(user=user)
+
+    return redirect('/staff')
+
+
 def booking():
     airports = dao.load_airports()
     return render_template('booking.html', airports=airports)
 
 
+def search_result():
+    if request.method == 'POST':
+        password = request.form['password']
+        confirm = request.form['confirm']
+        if password.__eq__(confirm):
+            try:
+                utils.register(name=request.form['name'],
+                               password=password,
+                               username=request.form['username'])
+
+                return redirect('/')
+            except:
+                err_msg = 'Đã có lỗi xảy ra! Vui lòng quay lại sau!'
+        else:
+            err_msg = 'Mật khẩu KHÔNG khớp!'
+
+    return render_template('search_booking.html')
+
+
 def booking_staff():
+    airports = dao.load_airports()
     from_airports = dao.load_from_airlines(airport_id=request.args.get("airport_id"),
                                            kw=request.args.get('keyword'))
-    return render_template('booking_staff.html', from_airports=from_airports)
+    return render_template('booking_staff.html', airports=airports, from_airports=from_airports)
 
 
 def from_airport(from_airport_id):

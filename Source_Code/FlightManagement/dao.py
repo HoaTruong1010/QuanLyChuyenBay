@@ -88,10 +88,11 @@ def get_user_by_id(user_id):
 #         db.session.commit()
 
 
-# def count_product_by_cate():
-#     return db.session.query(Category.id, Category.name, func.count(Product.id)) \
-#         .join(Product, Product.category_id.__eq__(Category.id), isouter=True) \
-#         .group_by(Category.id).order_by(Category.id).all()
+def count_result_by_airline():
+    return db.session.query(AirPort.id, AirPort.location, func.count(AirLine.id)) \
+        .join(AirLine, AirLine.from_airport_id.__eq__(AirPort.id), isouter=True) \
+        .join(AirLine, AirLine.to_airport_id.__eq__(AirPort.id), isouter=True) \
+        .group_by(AirLine.id).order_by(AirLine.id).all()
 
 
 def load_search_airport(kw=None, from_airport_id=None, to_airport_id=None):
