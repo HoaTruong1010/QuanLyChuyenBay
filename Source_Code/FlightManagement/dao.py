@@ -14,6 +14,14 @@ def load_airlines():
     return AirLine.query.all()
 
 
+def load_airplanes():
+    return AirPlane.query.all()
+
+
+def load_flights():
+    return Flight.query.all()
+
+
 def load_tickets():
     return PlaneTicket.query.all()
 

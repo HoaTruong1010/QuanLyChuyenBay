@@ -43,23 +43,23 @@ def booking():
     return render_template('booking.html', airports=airports)
 
 
-def search_result():
-    if request.method == 'POST':
-        password = request.form['password']
-        confirm = request.form['confirm']
-        if password.__eq__(confirm):
-            try:
-                utils.register(name=request.form['name'],
-                               password=password,
-                               username=request.form['username'])
-
-                return redirect('/')
-            except:
-                err_msg = 'Đã có lỗi xảy ra! Vui lòng quay lại sau!'
-        else:
-            err_msg = 'Mật khẩu KHÔNG khớp!'
-
-    return render_template('search_booking.html')
+# def search_result():
+#     if request.method == 'POST':
+#         password = request.form['password']
+#         confirm = request.form['confirm']
+#         if password.__eq__(confirm):
+#             try:
+#                 utils.register(name=request.form['name'],
+#                                password=password,
+#                                username=request.form['username'])
+#
+#                 return redirect('/')
+#             except:
+#                 err_msg = 'Đã có lỗi xảy ra! Vui lòng quay lại sau!'
+#         else:
+#             err_msg = 'Mật khẩu KHÔNG khớp!'
+#
+#     return render_template('search_booking.html')
 
 
 def booking_staff():
@@ -72,6 +72,16 @@ def booking_staff():
 def from_airport(from_airport_id):
     f = dao.get_from_airport_by_id(from_airport_id)
     return render_template('index.html', airline=f)
+
+
+def search_booking():
+    airports = dao.load_airports()
+    airlines = dao.load_airlines()
+    airplanes = dao.load_airplanes()
+    flights = dao.load_flights()
+    tickets = dao.load_tickets()
+    return render_template('search_booking.html', airports=airports, airlines=airlines,
+                           airplanes=airplanes, flights=flights, tickets=tickets)
 
 # def booking_ticket(airline_id):
 #     a = dao.get_airline_by_id(airline_id)
