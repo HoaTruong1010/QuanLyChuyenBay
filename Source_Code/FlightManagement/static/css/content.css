@@ -42,17 +42,17 @@ div.col33 {
     }
 
 /* ----- cột -----*/
-.col-md-4, .col-sm-12 {
+.content .col-md-4, .content .col-sm-12 {
     border-radius: 0.75rem;
     box-shadow: 0 0.0625rem 0.1875rem rgb(0 0 0 / 12%);
     cursor: pointer;
 }
 
-.col-md-4:hover {
+.content .col-md-4:hover {
     box-shadow: 0 0 30px #CCCCCC;
 }
 
-.col-sm-12:hover {
+.content .col-sm-12:hover {
     box-shadow: 0 0 30px #CCCCCC;
 }
 

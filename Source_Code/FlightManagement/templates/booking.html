@@ -1,10 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!--booking for customer-->
+{% extends 'layout/base.html' %}
 
-</body>
-</html>
+{% block content %}
+<section class="booking">
+<!--    <span class="content-header">-->
+<!--       Lên lịch đặt ngay một chiếc vé ưng ý nào-->
+<!--    </span>-->
+    <div class="booking-content">
+    <form method="post" class="booking-ticket">
+        <div class="header-content">
+            <h1>ĐẶT NGAY VÉ MÁY BAY ONLINE</h1>
+        </div>
+        {% if err_msg %}
+        <div class="alert alert-danger">
+            {{ err_msg }}
+        </div>
+        {% endif %}
+        <div class="booking-form">
+            <div class="flex">
+                <div class="booking-form">
+                    <div class="flex type-ticket">
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="khuhoi" name="optradio"
+                                   value="khứ hồi" checked>Khứ hồi
+                            <label class="form-check-label" for="khuhoi"></label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="motchieu" name="optradio"
+                                   value="một chiều">Một chiều
+                            <label class="form-check-label" for="motchieu"></label>
+                        </div>
+
+                        <div>
+                           <label for="rank">Hạng vé</label>
+
+                            <select name="rank" id="rank">
+                                <option value="1">Hạng 1</option>
+                                <option value="2">Hạng 2</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+<!--                        <div>-->
+<!--                            <span>Hạng vé</span>-->
+<!--                            <input type="text" required name="rank" placeholder="Chọn hạng vé...">-->
+<!--                        </div>-->
+                        <div class="place">
+                            <span>Từ</span>
+                            <input type="text" class="form-control"  required name="from" placeholder="Chọn nơi đi...">
+                        </div>
+                        <div class="place">
+                            <span>Đến</span>
+                            <input type="text" class="form-control"  required name="to" placeholder="Chọn nơi đến...">
+                        </div>
+                        <div class="row" style="margin-bottom: 10px;">
+                            <div class="col-md-6">
+                                <span>Ngày khởi hành</span>
+                                <input type="date" name="from_date" class="form-control" style="width: 100%">
+                            </div>
+                            <div class="col-md-6">
+                                <span>Ngày về</span>
+                                <input type="date" name="to_date" class="form-control" style="width: 100%">
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-bottom: 10px;">
+                            <div class="col-md-4">
+                                <span>Người lớn</span>
+                                <input type="number" class="form-control"
+                                       value="1" min="0" max="10" step="1" style="width: 100%"/>
+                            </div>
+                            <div class="col-md-4">
+                                <span>Trẻ em</span>
+                                <span class="sub-header">(2-12 tuổi)</span>
+                                <input type="number" class="form-control"
+                                       value="0" min="0" max="10" step="1" style="width: 100%"/>
+                            </div>
+                            <div class="col-md-4">
+                                <span>Em bé</span>
+                                <span class="sub-header">(< 2 tuổi)</span>
+                                <input type="number" class="form-control"
+                                       value="0" min="0" max="10" step="1" style="width: 100%"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bt">
+                        <div class="bt">
+                            <input type="submit" value="Tìm chuyến bay"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    </div>
+</section>
+{% endblock %}

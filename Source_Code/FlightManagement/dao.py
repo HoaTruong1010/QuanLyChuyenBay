@@ -38,6 +38,14 @@ def get_airline_by_id(airline_id):
     return AirLine.query.get(airline_id)
 
 
+def get_from_airport_by_id(from_airport_id):
+    return AirLine.query.get(from_airport_id)
+
+
+def get_to_airport_by_id(to_airport_id):
+    return AirLine.query.get(to_airport_id)
+
+
 def auth_user(username, password):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     return User.query.filter(User.username.__eq__(username.strip()),

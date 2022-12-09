@@ -5,6 +5,7 @@ from flask_login import login_user, logout_user
 
 app.add_url_rule('/', 'index', controllers.index)
 app.add_url_rule('/booking', 'booking', controllers.booking)
+app.add_url_rule('/booking_staff', 'booking_staff', controllers.booking_staff)
 
 
 @app.route("/", methods=['get', 'post'])

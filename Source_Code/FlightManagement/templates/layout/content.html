@@ -33,7 +33,7 @@
                         <div>
                             <span class="infor">Thứ 7, ngày 27/11/2022</span>
                             <br>
-                            <span>SGN - BKK, VietJet Air</span>
+                            <span>{{ a.name }}</span>
                         </div>
                         <div class="text">
                             <span>Bay thẳng</span>
@@ -52,41 +52,43 @@
     </div>
 </div>
 
-<div class="content">
-   <span class="content-header">
-       Lên lịch ngay cho chuyến du lịch của mình nào
-    </span>
+<!--<div class="content">-->
+<!--   <span class="content-header">-->
+<!--       Lên lịch ngay cho chuyến du lịch của mình nào-->
+<!--    </span>-->
 
-    <div class="search-wrapper">
-        <div class="search-control">
-            <!-- Nav pills -->
-            <ul class="nav nav-pills">
-                <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="pill" href="#HCM">Thành phố Hồ Chí Minh</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="pill" href="#HN">Hà Nội</a>
-                </li>
-            </ul>
+<!--    <div class="search-wrapper">-->
+<!--        <div class="search-control">-->
+<!--            &lt;!&ndash; Nav pills &ndash;&gt;-->
+<!--            <ul class="nav nav-pills">-->
+<!--                <li class="nav-item">-->
+<!--                    <a class="nav-link active" data-bs-toggle="pill" href="#HCM">Thành phố Hồ Chí Minh</a>-->
+<!--                </li>-->
+<!--                {% for a in airports %}-->
+<!--                <li class="nav-item">-->
+<!--                    <a class="nav-link" data-bs-toggle="pill" href="/?airport_id={{ a.id }}">{{ a.location }}</a>-->
+<!--                </li>-->
+<!--                {% endfor %}-->
+<!--            </ul>-->
 
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <div class="tab-pane container active" id="HCM">
-                    <div class="row">
-                        {% for air in airlines %}
-                        <div class="col-md-3 col-sm-12" style="padding:1rem;">
-                            <div class="card">
-                                <img class="card-img-top" src="{{ airports.image }}" alt="{{ airports.location }}">
-                                <div class="card-body">
-                                    <h4 class="card-title">{{ air.name }}</h4>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="tab-pane container fade" id="HN">...</div>
-            </div>
-        </div>
-    </div>
-</div>
+<!--            &lt;!&ndash; Tab panes &ndash;&gt;-->
+<!--            <div class="tab-content">-->
+<!--                <div class="tab-pane container active" id="HCM">-->
+<!--                    <div class="row">-->
+<!--                        {% for air in airlines %}-->
+<!--                        <div class="col-md-3 col-sm-12" style="padding:1rem;">-->
+<!--                            <div class="card">-->
+<!--                                <img class="card-img-top" src="{{ airports.image }}" alt="{{ airports.location }}">-->
+<!--                                <div class="card-body">-->
+<!--                                    <h4 class="card-title">{{ air.name }}</h4>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        {% endfor %}-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="tab-pane container fade" id="HN">...</div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->

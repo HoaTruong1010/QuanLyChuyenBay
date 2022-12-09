@@ -1,0 +1,1093 @@
+Index: FlightManagement/templates/layout/header.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/templates/layout/header.html b/FlightManagement/templates/layout/header.html
+--- a/FlightManagement/templates/layout/header.html	
++++ b/FlightManagement/templates/layout/header.html	
+@@ -10,7 +10,7 @@
+                     <a href="#">Giới thiệu </a>
+                 </li>
+                 <li>
+-                    <a href="#">Đặt vé</a>
++                    <a href="/booking_ticket">Đặt vé</a>
+                 </li>
+                 <li id="contact">
+                     <a href="#">Liên hệ</a>
+@@ -51,7 +51,7 @@
+         <div class="Slogan-btn">
+             <div class="out-line">
+                 <div class="in-line">
+-                    <a href="game.html" target="blank">ĐẶT VÉ NGAY!!!</a>
++                    <a href="/booking_ticket" target="blank">ĐẶT VÉ NGAY!!!</a>
+                 </div>
+             </div>
+         </div>
+Index: FlightManagement/index.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/index.py b/FlightManagement/index.py
+--- a/FlightManagement/index.py	
++++ b/FlightManagement/index.py	
+@@ -1,15 +1,15 @@
+ from flask import render_template, request, redirect, url_for
+-from FlightManagement import app, login, utils
++from FlightManagement import app, login, utils, dao, controllers
+ from FlightManagement.models import *
+ from flask_login import login_user, logout_user
+ 
+-
+-@app.route("/")
+-def index():
+-    return render_template("index.html")
++app.add_url_rule('/', 'index', controllers.index)
++app.add_url_rule('/login-admin', 'login-admin', controllers.login_admin, methods=['post'])
++app.add_url_rule('/airports/<string:airport_id>', 'airport-booking', controllers.booking)
++app.add_url_rule('/booking_ticket', 'booking-ticket', controllers.booking_ticket)
+ 
+ 
+-@app.route("/", methods=['get','post'])
++@app.route("/", methods=['get', 'post'])
+ def login_my_user():
+     if request.method == "POST":
+         username = request.form['username']
+@@ -40,8 +40,8 @@
+         if password.__eq__(confirm):
+             try:
+                 utils.register(name=request.form['name'],
+-                             password=password,
+-                             username=request.form['username'])
++                               password=password,
++                               username=request.form['username'])
+ 
+                 return redirect('/')
+             except:
+@@ -52,11 +52,10 @@
+     return render_template('register.html', err_msg=err_msg)
+ 
+ 
+-
+ @login.user_loader
+ def load_user(user_id):
+     return utils.get_user_by_id(user_id=user_id)
+ 
+ 
+ if __name__ == "__main__":
+-    app.run(debug=True)
+\ No newline at end of file
++    app.run(debug=True)
+Index: FlightManagement/models.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/models.py b/FlightManagement/models.py
+--- a/FlightManagement/models.py	
++++ b/FlightManagement/models.py	
+@@ -5,8 +5,9 @@
+ from flask_login import UserMixin
+ import hashlib
+ from datetime import datetime, time
+-from flask_admin.contrib.sqla import  ModelView
++from flask_admin.contrib.sqla import ModelView
+ 
++
+ class UserRole(UserEnum):
+     USER = 1
+     EMPLOYEE = 2
+@@ -69,7 +70,7 @@
+     id = Column(String(10), primary_key=True)
+     name = Column(String(50), nullable=False)
+     status = Column(Boolean, default=False)
+-    unit_price = Column(DECIMAL(18,2), nullable=False)
++    unit_price = Column(DECIMAL(18, 2), nullable=False)
+ 
+     plane_id = Column(String(10), ForeignKey(AirPlane.id), nullable=False)
+     tickets = relationship('PlaneTicket', backref='seats')
+@@ -83,6 +84,7 @@
+ 
+     id = Column(Integer, primary_key=True, autoincrement=True)
+     name = Column(String(50), nullable=False)
++    image = Column(String(100))
+     location = Column(String(100), nullable=False)
+ 
+     flight_airports = relationship('Flight_AirportMedium', backref='airports')
+@@ -97,7 +99,7 @@
+     id = Column(String(10), primary_key=True)
+     name = Column(String(100), nullable=False)
+ 
+-    from_airport_id = Column(Integer, ForeignKey(AirPort.id),nullable=False)
++    from_airport_id = Column(Integer, ForeignKey(AirPort.id), nullable=False)
+     to_airport_id = Column(Integer, ForeignKey(AirPort.id), nullable=False)
+ 
+     from_airport = relationship("AirPort", foreign_keys=[from_airport_id])
+@@ -145,7 +147,7 @@
+ 
+     id = Column(Integer, primary_key=True, autoincrement=True)
+     rank = Column(Integer, nullable=False)
+-    price = Column(DECIMAL(18,2), nullable=False)
++    price = Column(DECIMAL(18, 2), nullable=False)
+     date = Column(DateTime, default=datetime.now())
+     place = Column(String(100), nullable=False)
+ 
+@@ -181,11 +183,10 @@
+ admin.add_view(ModelView(PlaneTicket, db.session))
+ admin.add_view(ModelView(Regulation, db.session))
+ 
+-
+ if __name__ == '__main__':
+     with app.app_context():
+         # db.drop_all()
+-        # db.create_all()
++        db.create_all()
+ 
+         # password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
+         # u1 = User(name='An', username='an1100', password=password,
+@@ -212,22 +213,31 @@
+         # db.session.add_all([pl1, pl2, pl3])
+         # db.session.commit()
+ 
+-        # s1 = Seat(id='G1', name='Ghế 1', plane_id='MB1')
+-        # s2 = Seat(id='G2', name='Ghế 2', plane_id='MB2')
+-        # s3 = Seat(id='G3', name='Ghế 3', plane_id='MB3')
++        # s1 = Seat(id='G1', name='Ghế 1', unit_price='2000', plane_id='MB1')
++        # s2 = Seat(id='G2', name='Ghế 2', unit_price='2000', plane_id='MB2')
++        # s3 = Seat(id='G3', name='Ghế 3', unit_price='2000', plane_id='MB3')
+         # db.session.add_all([s1, s2, s3])
+         # db.session.commit()
+ 
+-        # sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội')
+-        # sb2 = AirPort(name='Sân bay Tân Sơn Nhất', location='Hồ Chí Minh')
+-        # sb3 = AirPort(name='Sân bay Phù Cát', location='Bình Định')
+-        # db.session.add_all([sb1, sb2, sb3])
++        # sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội',
++        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/HaNoi_wkzzg5.jpg')
++        # sb2 = AirPort(name='Sân bay Tân Sơn Nhất', location='Hồ Chí Minh',
++        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266575/Airport_Location/HCM_jpkw5e.jpg')
++        # sb3 = AirPort(name='Sân bay Phù Cát', location='Bình Định',
++        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/BinhDinh_c6yrif.jpg')
++        # sb4 = AirPort(name='Sân bay Suvarnabhumi', location='Thái Lan',
++        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266384/Airport_Location/ThaiLan_k533hb.jpg')
++        # sb5 = AirPort(name='Sân bay Narita', location='Nhật Bản',
++        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266739/Airport_Location/NhatBan_fzo3qw.jpg')
++        # db.session.add_all([sb1, sb2, sb3, sb4, sb5])
+         # db.session.commit()
+ 
+         # al1 = AirLine(id='1', name='Hà Nội - Hồ Chí Minh', from_airport_id='1', to_airport_id='2')
+         # al2 = AirLine(id='2', name='Hà Nội - Bình Định', from_airport_id='1', to_airport_id='3')
+         # al3 = AirLine(id='3', name='Bình Định - Hồ Chí Minh', from_airport_id='3', to_airport_id='2')
+-        # db.session.add_all([al1, al2, al3])
++        # al4 = AirLine(id='4', name='Hồ Chí Minh - Thái Lan', from_airport_id='2', to_airport_id='4')
++        # al5 = AirLine(id='5', name='Hồ Chí Minh - Nhật Bản', from_airport_id='2', to_airport_id='5')
++        # db.session.add_all([al1, al2, al3, al4, al5])
+         # db.session.commit()
+ 
+         # f1 = Flight(id='CB1', name='Chuyến bay 001', departing_at=datetime(2022, 12, 1, 13, 00, 00),
+@@ -254,12 +264,12 @@
+         # db.session.add_all([t1, t2, t3])
+         # db.session.commit()
+ 
+-        g1 = Regulation(name='book_time', value='12:00:00',
+-                        description='Thời gian đặt vé trước 12h lúc chuyến bay khởi hành')
+-        g2 = Regulation(name='sale_time', value='4:00:00',
+-                        description='Thời gian bán vé trước 4h lúc chuyến bay khởi hành')
+-        g3 = Regulation(name='rank_1', value='300000',
+-                        description='Vé hạng 1 phụ thu 300.000 VND')
+-        db.session.add_all([g1, g2, g3])
+-        db.session.commit()
+-        pass
+\ No newline at end of file
++        # g1 = Regulation(name='book_time', value='12:00:00',
++        #                 description='Thời gian đặt vé trước 12h lúc chuyến bay khởi hành')
++        # g2 = Regulation(name='sale_time', value='4:00:00',
++        #                 description='Thời gian bán vé trước 4h lúc chuyến bay khởi hành')
++        # g3 = Regulation(name='rank_1', value='300000',
++        #                 description='Vé hạng 1 phụ thu 300.000 VND')
++        # db.session.add_all([g1, g2, g3])
++        # db.session.commit()
++        # pass
+Index: FlightManagement/templates/index.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/templates/index.html b/FlightManagement/templates/index.html
+--- a/FlightManagement/templates/index.html	
++++ b/FlightManagement/templates/index.html	
+@@ -8,4 +8,7 @@
+             {% include 'login.html' %}
+         {% endblock %}
+     {% endif %}
++    {% block content1 %}
++        {% include 'layout/content.html' %}
++    {% endblock %}
+ {% endblock %}
+\ No newline at end of file
+Index: FlightManagement/__init__.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/__init__.py b/FlightManagement/__init__.py
+--- a/FlightManagement/__init__.py	
++++ b/FlightManagement/__init__.py	
+@@ -1,3 +1,5 @@
++from urllib.parse import quote
++
+ from flask import Flask
+ from flask_sqlalchemy import SQLAlchemy
+ from flask_admin import Admin
+@@ -5,7 +7,8 @@
+ 
+ app = Flask(__name__)
+ app.secret_key='rtytghkjgkgur'
+-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:10102002@localhost/flight_management_db?charset=utf8mb4'
++app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%s@localhost/flight_management_db?charset=utf8mb4'\
++                                        % quote('Nhi2311@')
+ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+ 
+ db = SQLAlchemy(app=app)
+Index: FlightManagement/decorators.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/decorators.py b/FlightManagement/decorators.py
+new file mode 100644
+--- /dev/null	
++++ b/FlightManagement/decorators.py	
+@@ -0,0 +1,13 @@
++from functools import wraps
++from flask_login import current_user
++from flask import redirect
++
++
++def anonymous_user(f):
++    def decorated_func(*args, **kwargs):
++        if current_user.is_authenticated:
++            return redirect('/')
++
++        return f(*args, **kwargs)
++
++    return decorated_func
+Index: FlightManagement/dao.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/dao.py b/FlightManagement/dao.py
+new file mode 100644
+--- /dev/null	
++++ b/FlightManagement/dao.py	
+@@ -0,0 +1,51 @@
++from FlightManagement.models import User, Profile, AirPlane, Seat, AirPort, AirLine, Flight, \
++    Flight_AirportMedium, PlaneTicket, Regulation
++from FlightManagement import db
++from flask_login import current_user
++import hashlib
++
++
++def load_airports():
++    return AirPort.query.all()
++
++
++def load_airlines():
++    return AirLine.query.all()
++
++
++def load_from_airports(airport_id=None, kw=None):
++    query = AirLine.query.filter()
++
++    if airport_id:
++        query = query.filter(AirLine.from_airport_id.__eq__(airport_id))
++
++    if kw:
++        query = query.filter(AirLine.name.contains(kw))
++
++    return query.all()
++
++
++
++def get_airport_by_id(airport_id):
++    return AirPort.query.get(airport_id)
++
++
++def get_airline_by_id(airline_id):
++    return AirLine.query.get(airline_id)
++
++
++def auth_user(username, password):
++    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
++    return User.query.filter(User.username.__eq__(username.strip()),
++                             User.password.__eq__(password)).first()
++
++
++def register(name, username, password):
++    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
++    u = User(name=name, username=username.strip(), password=password)
++    db.session.add(u)
++    db.session.commit()
++
++
++def get_user_by_id(user_id):
++    return User.query.get(user_id)
+Index: FlightManagement/templates/layout/base.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/templates/layout/base.html b/FlightManagement/templates/layout/base.html
+--- a/FlightManagement/templates/layout/base.html	
++++ b/FlightManagement/templates/layout/base.html	
+@@ -14,6 +14,7 @@
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/content.css') }}">
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
++    <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+ 
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+Index: FlightManagement/controllers.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/controllers.py b/FlightManagement/controllers.py
+new file mode 100644
+--- /dev/null	
++++ b/FlightManagement/controllers.py	
+@@ -0,0 +1,32 @@
++from flask import render_template, request, redirect, session, jsonify
++from FlightManagement import app, dao, utils
++from flask_login import login_user, logout_user, login_required
++from FlightManagement.decorators import anonymous_user
++# import cloudinary.uploader
++
++
++def index():
++    airports = dao.load_airports()
++    airlines = dao.load_from_airports(airport_id=request.args.get("airport_id"),
++                                 kw=request.args.get('keyword'))
++    return render_template('index.html', airlines=airlines, airports=airports)
++
++
++def login_admin():
++    username = request.form['username']
++    password = request.form['password']
++
++    user = dao.auth_user(username=username, password=password)
++    if user:
++        login_user(user=user)
++
++    return redirect('/admin')
++
++
++def booking(airport_id):
++    a = dao.get_airline_by_id(airport_id)
++    return render_template('booking.html', airport=a)
++
++
++def booking_ticket():
++    return render_template('booking.html')
+Index: FlightManagement/static/css/booking.css
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/static/css/booking.css b/FlightManagement/static/css/booking.css
+new file mode 100644
+--- /dev/null	
++++ b/FlightManagement/static/css/booking.css	
+@@ -0,0 +1,44 @@
++/*Booking content*/
++.booking-container {
++}
++
++ul, li {
++    list-style: none;
++    padding-left: 0;
++}
++
++.navbartab {
++    padding-top: 15px;
++    position: relative;
++    margin: auto;
++    max-width: 845px;
++    z-index: 10;
++}
++
++.nav {
++    padding-left:0;
++    margin-bottom: 0;
++    list-style: none;
++}
++
++.nav-tabs {
++    position: relative;
++    width: 100%;
++    margin: auto;
++    z-index: 9;
++    overflow: hidden;
++}
++
++.nav-tabs li {
++    float: none;
++}
++
++.navtab1 {
++}
++
++.nav-tabs li.active a {
++    opacity: 1;
++    background-color: #02122c;
++    color: #fff;
++
++}
+\ No newline at end of file
+Index: FlightManagement/static/css/content.css
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/static/css/content.css b/FlightManagement/static/css/content.css
+--- a/FlightManagement/static/css/content.css	
++++ b/FlightManagement/static/css/content.css	
+@@ -1,9 +1,12 @@
+ /* -------- content --------*/
+ .content {
++    margin-top: 2.5rem;
+     height: 100%;
+     width: 100%;
+     display: flex;
+     flex-direction: column;
++    /*margin-top: 1.5rem;
++    margin-bottom: 1.5rem;*/
+ }
+ 
+ .content-header {
+@@ -13,8 +16,11 @@
+ }
+ 
+ .search-wrapper {
+-    padding: 1.5rem;
+-    border-radius: 0.5rem;
++    padding-top: 0.75rem;
++}
++
++.nav-pills .nav-link {
++    border-radius: 2.5rem;
+ }
+ 
+ /* -------- content 2 --------*/
+@@ -40,12 +46,40 @@
+     }
+ 
+ /* ----- cột -----*/
++.col-md-4, .col-sm-12 {
++    border-radius: 0.75rem;
++    box-shadow: 0 0.0625rem 0.1875rem rgb(0 0 0 / 12%);
++    cursor: pointer;
++    transition: .3s;
++}
++
++.col-md-4:hover {
++    box-shadow: 0 0 30px #CCCCCC;
++}
++
++.col-sm-12:hover {
++    box-shadow: 0 0 30px #CCCCCC;
++}
++
+ .col1, .col2, .col3 {
+     flex-direction: column;
+     flex-grow: 1;
+     border-radius: 0.75rem;
+     box-shadow: 0 0.0625rem 0.1875rem rgb(0 0 0 / 12%);
+     cursor: pointer;
++    transition: .3s;
++}
++
++.col1:hover {
++    box-shadow: 0 0 30px #CCCCCC;
++}
++
++.col2:hover {
++    box-shadow: 0 0 30px #CCCCCC;
++}
++
++.col3:hover {
++    box-shadow: 0 0 30px #CCCCCC;
+ }
+ 
+ .image-wrapper {
+@@ -54,12 +88,8 @@
+ }
+ 
+ .images {
+-    background-image: url(/static/images/ThaiLan.jpg);
+     width: 100%;
+-    height: 100%;
+-    background-repeat: no-repeat;
+-    background-position: 100% 100%;
+-    background-size: cover;
++    height: 200px;
+     border-radius: 6px;
+   }
+ 
+Index: FlightManagement/templates/staff_booking.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/templates/staff_booking.html b/FlightManagement/templates/staff_booking.html
+new file mode 100644
+--- /dev/null	
++++ b/FlightManagement/templates/staff_booking.html	
+@@ -0,0 +1,10 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++    <meta charset="UTF-8">
++    <title>Title</title>
++</head>
++<body>
++
++</body>
++</html>
+\ No newline at end of file
+Index: FlightManagement/templates/layout/content.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/templates/layout/content.html b/FlightManagement/templates/layout/content.html
+--- a/FlightManagement/templates/layout/content.html	
++++ b/FlightManagement/templates/layout/content.html	
+@@ -1,32 +1,4 @@
+ <!-- content -->
+-<div class="content">
+-   <span class="content-header">
+-       Đặt vé máy bay
+-    </span>
+-
+-    <div class="search-wrapper">
+-        <div class="search-control">
+-            <!-- Nav pills -->
+-            <ul class="nav nav-pills">
+-                <li class="nav-item">
+-                    <a class="nav-link active" data-bs-toggle="pill" href="#khuhoi">Khứ hồi</a>
+-                </li>
+-                <li class="nav-item">
+-                    <a class="nav-link" data-bs-toggle="pill" href="#motchieu">Một chiều</a>
+-                </li>
+-            </ul>
+-
+-            <!-- Tab panes -->
+-            <div class="tab-content">
+-                <div class="tab-pane container active" id="khuhoi">
+-
+-                </div>
+-                <div class="tab-pane container fade" id="motchieu">...</div>
+-            </div>
+-        </div>
+-    </div>
+-</div>
+-
+ <div class="content">
+     <span class="content-header">
+        Khám phá các chuyến bay phổ biến nhất
+@@ -41,115 +13,202 @@
+         </span>
+     </div>
+ 
+-    <div class="flex content-wrapper">
+-        <div class="flex col33">
+-            <div class="flex col1">
+-                <div class="image-wrapper">
+-                    <img class="images" src="{{ url_for('static', filename= 'images/ThaiLan.jpg') }}" alt="Bangkok">
+-                </div>
++    <div class="row">
++    {% for a in airports %}
++    <div class="col-md-4 col-sm-12" style="padding:1rem;">
++       <div class="image-wrapper">
++           <img class="images" src="{{ a.image }}" alt="{{ a.location }}">
++       </div>
+ 
+-                <div class="details">
+-                    <div class="details-header">
+-                        <span>Bangkok</span>
+-                    </div>
++        <div class="details">
++            <div class="details-header">
++                <span>{{ a.location }}</span>
++            </div>
+ 
+-                    <div>
+-                        <div class="flex details-items">
+-                            <div class="img-icons">
+-                                <img src="{{ url_for('static', filename='images/VJ.png') }}" alt="VietJet Air">
+-                            </div>
+-                            <div>
+-                                <span class="infor">Thứ 7, ngày 27/11/2022</span>
+-                                <br>
+-                                <span>SGN - BKK, VietJet Air</span>
+-                            </div>
+-                            <div class="text">
+-                                <span>Bay thẳng</span>
+-                            </div>
+-                        </div>
+-                    </div>
+-                </div>
++            <div>
++                <div class="flex details-items">
++                    <div class="img-icons">
++                        <img src="{{ url_for('static', filename='images/VJ.png') }}" alt="VietJet Air">
++                    </div>
++                    <div>
++                        <span class="infor">Thứ 7, ngày 27/11/2022</span>
++                        <br>
++                        <span>SGN - BKK, VietJet Air</span>
++                    </div>
++                    <div class="text">
++                        <span>Bay thẳng</span>
++                    </div>
++                </div>
++            </div>
++        </div>
+ 
+-                <div class="flex prices">
+-                    <span>2.000.000 ₫</span>
+-                    <i class="fas fa-plane-departure"></i>
+-                </div>
+-                <br>
+-            </div>
+-        </div>
++        <div class="flex prices">
++            <span>2.000.000 ₫</span>
++            <i class="fas fa-plane-departure"></i>
++        </div>
++    </div>
++    {% endfor %}
++</div>
+ 
+-         <div class="flex col33">
+-            <div class="flex col2">
+-                <div class="image-wrapper">
+-                    <img class="images" src="{{ url_for('static', filename= 'images/ThaiLan.jpg') }}" alt="Bangkok">
+-                </div>
++<!--    <div class="flex content-wrapper">-->
++<!--        -->
++<!--&lt;!&ndash;        <div class="flex col33">&ndash;&gt;-->
++<!--&lt;!&ndash;            <div class="flex col1">&ndash;&gt;-->
++<!--&lt;!&ndash;                <div class="image-wrapper">&ndash;&gt;-->
++<!--&lt;!&ndash;                    <img class="images" src="{{ url_for('static', filename= 'images/ThaiLan.jpg') }}" alt="Bangkok">&ndash;&gt;-->
++<!--&lt;!&ndash;                </div>&ndash;&gt;-->
++
++<!--&lt;!&ndash;                <div class="details">&ndash;&gt;-->
++<!--&lt;!&ndash;                    <div class="details-header">&ndash;&gt;-->
++<!--&lt;!&ndash;                        <span>Bangkok</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
++
++<!--&lt;!&ndash;                    <div>&ndash;&gt;-->
++<!--&lt;!&ndash;                        <div class="flex details-items">&ndash;&gt;-->
++<!--&lt;!&ndash;                            <div class="img-icons">&ndash;&gt;-->
++<!--&lt;!&ndash;                                <img src="{{ url_for('static', filename='images/VJ.png') }}" alt="VietJet Air">&ndash;&gt;-->
++<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                            <div>&ndash;&gt;-->
++<!--&lt;!&ndash;                                <span class="infor">Thứ 7, ngày 27/11/2022</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                                <br>&ndash;&gt;-->
++<!--&lt;!&ndash;                                <span>SGN - BKK, VietJet Air</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                            <div class="text">&ndash;&gt;-->
++<!--&lt;!&ndash;                                <span>Bay thẳng</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                </div>&ndash;&gt;-->
++
++<!--&lt;!&ndash;                <div class="flex prices">&ndash;&gt;-->
++<!--&lt;!&ndash;                    <span>2.000.000 ₫</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                    <i class="fas fa-plane-departure"></i>&ndash;&gt;-->
++<!--&lt;!&ndash;                </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                <br>&ndash;&gt;-->
++<!--&lt;!&ndash;            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;        </div>&ndash;&gt;-->
++
++<!--&lt;!&ndash;         <div class="flex col33">&ndash;&gt;-->
++<!--&lt;!&ndash;            <div class="flex col2">&ndash;&gt;-->
++<!--&lt;!&ndash;                <div class="image-wrapper">&ndash;&gt;-->
++<!--&lt;!&ndash;                    <img class="images" src="{{ url_for('static', filename= 'images/ThaiLan.jpg') }}" alt="Bangkok">&ndash;&gt;-->
++<!--&lt;!&ndash;                </div>&ndash;&gt;-->
++
++<!--&lt;!&ndash;                <div class="details">&ndash;&gt;-->
++<!--&lt;!&ndash;                    <div class="details-header">&ndash;&gt;-->
++<!--&lt;!&ndash;                        <span>Bangkok</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
++
++<!--&lt;!&ndash;                    <div>&ndash;&gt;-->
++<!--&lt;!&ndash;                        <div class="flex details-items">&ndash;&gt;-->
++<!--&lt;!&ndash;                            <div class="img-icons">&ndash;&gt;-->
++<!--&lt;!&ndash;                                <img src="{{ url_for('static', filename='images/VJ.png') }}" alt="VietJet Air">&ndash;&gt;-->
++<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                            <div>&ndash;&gt;-->
++<!--&lt;!&ndash;                                <span class="infor">Thứ 7, ngày 27/11/2022</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                                <br>&ndash;&gt;-->
++<!--&lt;!&ndash;                                <span>SGN - BKK, VietJet Air</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                            <div class="text">&ndash;&gt;-->
++<!--&lt;!&ndash;                                <span>Bay thẳng</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                </div>&ndash;&gt;-->
++
++<!--&lt;!&ndash;                <div class="flex prices">&ndash;&gt;-->
++<!--&lt;!&ndash;                    <span>2.000.000 ₫</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                    <i class="fas fa-plane-departure"></i>&ndash;&gt;-->
++<!--&lt;!&ndash;                </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                <br>&ndash;&gt;-->
++<!--&lt;!&ndash;            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;        </div>&ndash;&gt;-->
++
++<!--&lt;!&ndash;         <div class="flex col33">&ndash;&gt;-->
++<!--&lt;!&ndash;            <div class="flex col3">&ndash;&gt;-->
++<!--&lt;!&ndash;                <div class="image-wrapper">&ndash;&gt;-->
++<!--&lt;!&ndash;                   <img class="images" src="{{ url_for('static', filename= 'images/ThaiLan.jpg') }}" alt="Bangkok">&ndash;&gt;-->
++<!--&lt;!&ndash;                </div>&ndash;&gt;-->
++
++<!--&lt;!&ndash;                <div class="details">&ndash;&gt;-->
++<!--&lt;!&ndash;                    <div class="details-header">&ndash;&gt;-->
++<!--&lt;!&ndash;                        <span>Bangkok</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
++
++<!--&lt;!&ndash;                    <div>&ndash;&gt;-->
++<!--&lt;!&ndash;                        <div class="flex details-items">&ndash;&gt;-->
++<!--&lt;!&ndash;                            <div class="img-icons">&ndash;&gt;-->
++<!--&lt;!&ndash;                                <img src="{{ url_for('static', filename='images/VJ.png') }}" alt="VietJet Air">&ndash;&gt;-->
++<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                            <div>&ndash;&gt;-->
++<!--&lt;!&ndash;                                <span class="infor">Thứ 7, ngày 27/11/2022</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                                <br>&ndash;&gt;-->
++<!--&lt;!&ndash;                                <span>SGN - BKK, VietJet Air</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                            <div class="text">&ndash;&gt;-->
++<!--&lt;!&ndash;                                <span>Bay thẳng</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                </div>&ndash;&gt;-->
++
++<!--&lt;!&ndash;                <div class="flex prices">&ndash;&gt;-->
++<!--&lt;!&ndash;                    <span>2.000.000 ₫</span>&ndash;&gt;-->
++<!--&lt;!&ndash;                    <i class="fas fa-plane-departure"></i>&ndash;&gt;-->
++<!--&lt;!&ndash;                </div>&ndash;&gt;-->
++<!--&lt;!&ndash;                <br>&ndash;&gt;-->
++<!--&lt;!&ndash;            </div>&ndash;&gt;-->
++<!--&lt;!&ndash;        </div>&ndash;&gt;-->
++
++<!--    </div>-->
++</div>
+ 
+-                <div class="details">
+-                    <div class="details-header">
+-                        <span>Bangkok</span>
+-                    </div>
+-
+-                    <div>
+-                        <div class="flex details-items">
+-                            <div class="img-icons">
+-                                <img src="{{ url_for('static', filename='images/VJ.png') }}" alt="VietJet Air">
++<div class="content">
++   <span class="content-header">
++       Lên kế hoạch du lịch tại chỗ ngay hôm nay
++    </span>
++
++    <div class="search-wrapper">
++        <div class="search-control">
++            <!-- Nav pills -->
++            <ul class="nav nav-pills">
++<!--                {% for airport in airports %}-->
++<!--                <li class="nav-item">-->
++<!--                    <a class="nav-link" data-bs-toggle="pill" href="/?airport_id={{ airport.id }}">{{ airport.location }}</a>-->
++<!--                </li>-->
++<!--                {% endfor %}-->
++                <li class="nav-item">
++                    <a class="nav-link active" data-bs-toggle="pill" href="#HCM">Thành phố Hồ Chí Minh</a>
++                </li>
++                <li class="nav-item">
++                    <a class="nav-link" data-bs-toggle="pill" href="#DN">Đà Nẵng</a>
++                </li>
++                <li class="nav-item">
++                    <a class="nav-link" data-bs-toggle="pill" href="#HN">Hà Nội</a>
++                </li>
++            </ul>
++
++            <!-- Tab panes -->
++            <div class="tab-content">
++                <div class="tab-pane container active" id="HCM">
++                    <div class="row">
++                        {% for a in airlines %}
++                        <div class="col-md-3 col-sm-12" style="padding:1rem;">
++                            <div class="card">
++                                <img class="card-img-top" src="{{ url_for('static', filename= 'images/ThaiLan.jpg')
++                                    }}" alt="{{ a.location }}">
++                                <div class="card-body">
++                                    <h4 class="card-title">{{ a.location }}</h4>
++                                    <a href="/airports/{{a.id}}" class="btn btn-primary">Xem chi tiết</a>
++                                </div>
+                             </div>
+-                            <div>
+-                                <span class="infor">Thứ 7, ngày 27/11/2022</span>
+-                                <br>
+-                                <span>SGN - BKK, VietJet Air</span>
+-                            </div>
+-                            <div class="text">
+-                                <span>Bay thẳng</span>
+-                            </div>
+-                        </div>
+-                    </div>
+-                </div>
+-
+-                <div class="flex prices">
+-                    <span>2.000.000 ₫</span>
+-                    <i class="fas fa-plane-departure"></i>
+-                </div>
+-                <br>
+-            </div>
+-        </div>
+-
+-         <div class="flex col33">
+-            <div class="flex col3">
+-                <div class="image-wrapper">
+-                   <img class="images" src="{{ url_for('static', filename= 'images/ThaiLan.jpg') }}" alt="Bangkok">
+-                </div>
+-
+-                <div class="details">
+-                    <div class="details-header">
+-                        <span>Bangkok</span>
+-                    </div>
+-
+-                    <div>
+-                        <div class="flex details-items">
+-                            <div class="img-icons">
+-                                <img src="{{ url_for('static', filename='images/VJ.png') }}" alt="VietJet Air">
+-                            </div>
+-                            <div>
+-                                <span class="infor">Thứ 7, ngày 27/11/2022</span>
+-                                <br>
+-                                <span>SGN - BKK, VietJet Air</span>
+-                            </div>
+-                            <div class="text">
+-                                <span>Bay thẳng</span>
+-                            </div>
+-                        </div>
+-                    </div>
+-                </div>
+-
+-                <div class="flex prices">
+-                    <span>2.000.000 ₫</span>
+-                    <i class="fas fa-plane-departure"></i>
+-                </div>
+-                <br>
+-            </div>
+-        </div>
+-
+-    </div>
+-</div>
+-
++                        </div>
++                        {% endfor %}
++                    </div>
++                </div>
++                <div class="tab-pane container fade" id="DN">...</div>
++                <div class="tab-pane container fade" id="HN">...</div>
++            </div>
++        </div>
++    </div>
++</div>
+\ No newline at end of file
+Index: FlightManagement/templates/booking.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/templates/booking.html b/FlightManagement/templates/booking.html
+new file mode 100644
+--- /dev/null	
++++ b/FlightManagement/templates/booking.html	
+@@ -0,0 +1,45 @@
++{% extends 'layout/base.html' %}
++
++{% block content %}
++  <div class="container">
++    <nav class="navbartab">
++<!--      Nav bar tab-->
++      <ul class="nav nav-tabs" role="tablist">
++        <li role="presentation" class="navtab1 active">
++          <a href="#navtab1" aria-controls="home" role="tab" data-toggle="pill" data-content-title="Mua vé">
++            <div class="icon-book">
++              <i class="fa-solid fa-plane"></i>
++              <span>Mua vé</span>
++            </div>
++          </a>
++        </li>
++        <li role="presentation" class="navtab2">
++          <a href="#navtab2" aria-controls="home" role="tab" data-toggle="pill" data-content-title="Tra cứu chuyến bay">
++            <div class="icon-book">
++              <i class="fa-solid fa-magnifying-glass"></i>
++              <span>Tra cứu chuyến bay</span>
++            </div>
++          </a>
++        </li>
++      </ul>
++      <div class="tab-content sub-tab-content active">
++        <ul class="nav booktrip-tab" id="bookTripType">
++          <li class="active">
++            <a href="#khuHoi" id="khuHoi" data-content-title="Khứ Hồi">Khứ hồi</a>
++          </li>
++          <li>
++            <a href="#motChieu" id="motChieu" data-content-title="Một chiều">Một chiều</a>
++          </li>
++         <li>
++            <a href="#nhieuChang" id="nhieuChang" data-content-title="Nhiều chặng">Nhiều chặng</a>
++          </li>
++        </ul>
++        <div class="book-trip-tab khuHoi-tab subtab-content">
++          <div class="form-group">
++
++          </div>
++        </div>
++      </div>
++    </nav>
++  </div>
++{% endblock %}
+\ No newline at end of file
+Index: .idea/Source_Code.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/Source_Code.iml b/.idea/Source_Code.iml
+--- a/.idea/Source_Code.iml	
++++ b/.idea/Source_Code.iml	
+@@ -1,7 +1,9 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <module type="PYTHON_MODULE" version="4">
+   <component name="NewModuleRootManager">
+-    <content url="file://$MODULE_DIR$" />
++    <content url="file://$MODULE_DIR$">
++      <excludeFolder url="file://$MODULE_DIR$/venv" />
++    </content>
+     <orderEntry type="inheritedJdk" />
+     <orderEntry type="sourceFolder" forTests="false" />
+   </component>
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	
++++ b/.idea/workspace.xml	
+@@ -5,7 +5,26 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="8cc7a614-e245-4d2b-bfdc-1b5ace720f78" name="Changes" comment="create header and footer">
+-      <change beforePath="$PROJECT_DIR$/Requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Requirements.txt" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/FlightManagement/controllers.py" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/FlightManagement/dao.py" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/FlightManagement/decorators.py" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/FlightManagement/static/css/booking.css" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/FlightManagement/static/images/ThaiLan.jpg" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/FlightManagement/static/images/VJ.png" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/FlightManagement/templates/booking.html" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/FlightManagement/templates/staff_booking.html" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/../Bai_Bao_Cao/BBC_Nhom4_DeTai5.docx" beforeDir="false" afterPath="$PROJECT_DIR$/../Bai_Bao_Cao/BBC_Nhom4_DeTai5.docx" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/Source_Code.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Source_Code.iml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/FlightManagement/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/__init__.py" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/FlightManagement/index.py" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/index.py" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/FlightManagement/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/models.py" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/FlightManagement/static/css/content.css" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/static/css/content.css" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/FlightManagement/static/css/header.css" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/static/css/header.css" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/index.html" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/layout/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/layout/base.html" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/layout/content.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/layout/content.html" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/layout/header.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/layout/header.html" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -15,8 +34,8 @@
+   <component name="FileTemplateManagerImpl">
+     <option name="RECENT_TEMPLATES">
+       <list>
+-        <option value="Python Script" />
+         <option value="HTML File" />
++        <option value="Python Script" />
+       </list>
+     </option>
+   </component>
+@@ -27,20 +46,23 @@
+     <option name="stateVersion" value="1" />
+   </component>
+   <component name="ProjectId" id="2HyDhuRGiFdUmy7u9X3ocMnxJpu" />
+-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
++  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
++    <ConfirmationsSetting value="2" id="Add" />
++  </component>
+   <component name="ProjectViewState">
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent">{
+-  &quot;keyToString&quot;: {
+-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-    &quot;last_opened_file_path&quot;: &quot;D:/Cong_nghe_phan_mem/Thuc_Hanh/IT2002-FlaskSaleWeb/saleappv1&quot;,
+-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "ASKED_ADD_EXTERNAL_FILES": "true",
++    "DefaultHtmlFileTemplate": "HTML File",
++    "RunOnceActivity.OpenProjectViewOnStart": "true",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "last_opened_file_path": "D:/CNTT/CNPM/IT2002-FlaskSaleWeb/saleappv2",
++    "settings.editor.selected.configurable": "configurable.group.tools"
+   }
+-}</component>
++}]]></component>
+   <component name="RunManager" selected="Python.index">
+     <configuration name="index" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+       <module name="Source_Code" />
+@@ -122,6 +144,7 @@
+     </option>
+   </component>
+   <component name="VcsManagerConfiguration">
++    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+     <MESSAGE value="create header and footer" />
+     <option name="LAST_COMMIT_MESSAGE" value="create header and footer" />
+   </component>
+Index: FlightManagement/static/css/header.css
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FlightManagement/static/css/header.css b/FlightManagement/static/css/header.css
+--- a/FlightManagement/static/css/header.css	
++++ b/FlightManagement/static/css/header.css	
+@@ -42,9 +42,9 @@
+   align-items: center;
+ }
+ 
+-.container {
++/*.container {
+     height: 100%;
+-}
++}*/
+ 
+ /* --------header --------*/
+ 

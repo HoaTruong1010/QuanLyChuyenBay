@@ -7,10 +7,10 @@ import cloudinary.uploader
 
 def index():
     airports = dao.load_airports()
-    airlines = dao.load_from_airlines(airport_id=request.args.get("airport_id"),
-                                 kw=request.args.get('keyword'))
+    from_airports = dao.load_from_airlines(airport_id=request.args.get("airport_id"),
+                                           kw=request.args.get('keyword'))
     tickets = dao.load_tickets()
-    return render_template('index.html', airports=airports, airlines=airlines, tickets=tickets)
+    return render_template('index.html', airports=airports, from_airports=from_airports, tickets=tickets)
 
 
 def login_admin():
@@ -27,6 +27,14 @@ def login_admin():
 def booking():
     return render_template('booking.html')
 
+
+def booking_staff():
+    return render_template('booking_staff.html')
+
+
+def from_airport(from_airport_id):
+    f = dao.get_from_airport_by_id(from_airport_id)
+    return render_template('index.html', airline=f)
 
 # def booking_ticket(airline_id):
 #     a = dao.get_airline_by_id(airline_id)
