@@ -9,27 +9,75 @@
 
 
     <!-- The Modal -->
-    <div class="modal" id="myModal">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
+    <div class="flex type">
 
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h4 class="modal-title">Modal Heading</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <!-- Modal body -->
-                <div class="modal-body">
-                    Modal body..
-                </div>
-
-                <!-- Modal footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
+        <div>
+            <label for="rank">Hạng vé</label>
+            <select name="rank" id="rank">
+                <option value="1">Hạng 1</option>
+                <option value="2">Hạng 2</option>
+            </select>
         </div>
     </div>
+
+    <!-- Tab panes -->
+
+            <div class="form-group">
+                <div class="place">
+                    <form action="/">
+                        <label for="fromairport">
+                         <span>Từ</span>
+                        </label>
+                        <input type="text" class="form-control" list="airports" name="from" id="fromairport"
+                           placeholder="Chọn nơi đi...">
+
+                        <datalist id="airports">
+                            {% for a in airports %}
+                                <option value="{{ a.name }}">
+                            {% endfor %}
+                        </datalist>
+                    </form>
+                </div>
+                <div class="place">
+                    <span>Đến</span>
+                    <input type="text" class="form-control"  required name="to" placeholder="Chọn nơi đến...">
+                </div>
+                <div class="row" style="margin-bottom: 10px;">
+                    <div class="col-md-6">
+                        <span>Ngày khởi hành</span>
+                        <input type="date" name="from_date" class="form-control" style="width: 100%">
+                    </div>
+                    <div class="col-md-6">
+                        <span>Ngày về</span>
+                        <input type="date" name="to_date" class="form-control" style="width: 100%">
+                    </div>
+                </div>
+
+                <div class="row" style="margin-bottom: 10px;">
+                    <div class="col-md-4">
+                        <span>Người lớn</span>
+                        <input type="number" class="form-control"
+                                       value="1" min="0" max="10" step="1" style="width: 100%"/>
+                    </div>
+                    <div class="col-md-4">
+                        <span>Trẻ em</span>
+                        <span class="sub-header">(2-12 tuổi)</span>
+                        <input type="number" class="form-control"
+                                       value="0" min="0" max="10" step="1" style="width: 100%"/>
+                    </div>
+                    <div class="col-md-4">
+                        <span>Em bé</span>
+                        <span class="sub-header">(< 2 tuổi)</span>
+                        <input type="number" class="form-control"
+                                       value="0" min="0" max="10" step="1" style="width: 100%"/>
+                    </div>
+                </div>
+            </div>
+            <div class="bt">
+                <div class="bt">
+                    <input type="submit" value="Tìm chuyến bay"/>
+                </div>
+            </div>
+
 </div>
 {% endblock %}

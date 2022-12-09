@@ -48,20 +48,32 @@
 <!--                        </div>-->
                         <div class="place">
                             <span>Từ</span>
-                            <input type="text" class="form-control"  required name="from" placeholder="Chọn nơi đi...">
+                            <input type="text" class="form-control" list="f_airports" name="from"
+                                   placeholder="Chọn nơi đi...">
+                            <datalist id="f_airports">
+                                {% for a in airports %}
+                                    <option value="{{ a.location }}">
+                                {% endfor %}
+                            </datalist>
                         </div>
                         <div class="place">
                             <span>Đến</span>
-                            <input type="text" class="form-control"  required name="to" placeholder="Chọn nơi đến...">
+                            <input type="text" class="form-control" list="t_airports" name="to"
+                                   placeholder="Chọn nơi đến...">
+                            <datalist id="t_airports">
+                                {% for a in airports %}
+                                    <option value="{{ a.location }}">
+                                {% endfor %}
+                            </datalist>
                         </div>
                         <div class="row" style="margin-bottom: 10px;">
                             <div class="col-md-6">
                                 <span>Ngày khởi hành</span>
-                                <input type="date" name="from_date" class="form-control" style="width: 100%">
+                                <input type="date" id="from_date" name="from_date" class="form-control" style="width: 100%">
                             </div>
                             <div class="col-md-6">
                                 <span>Ngày về</span>
-                                <input type="date" name="to_date" class="form-control" style="width: 100%">
+                                <input type="date" id="to_date" name="to_date" class="form-control" style="width: 100%">
                             </div>
                         </div>
 

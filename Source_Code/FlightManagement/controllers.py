@@ -9,8 +9,11 @@ def index():
     airports = dao.load_airports()
     from_airports = dao.load_from_airlines(airport_id=request.args.get("airport_id"),
                                            kw=request.args.get('keyword'))
+    to_airports = dao.load_to_airlines(airport_id=request.args.get("airport_id"),
+                                           kw=request.args.get("keyword"))
     tickets = dao.load_tickets()
-    return render_template('index.html', airports=airports, from_airports=from_airports, tickets=tickets)
+    return render_template('index.html', airports=airports, from_airports=from_airports, to_airports=to_airports,
+                           tickets=tickets)
 
 
 def login_admin():
@@ -25,11 +28,14 @@ def login_admin():
 
 
 def booking():
-    return render_template('booking.html')
+    airports = dao.load_airports()
+    return render_template('booking.html', airports=airports)
 
 
 def booking_staff():
-    return render_template('booking_staff.html')
+    from_airports = dao.load_from_airlines(airport_id=request.args.get("airport_id"),
+                                           kw=request.args.get('keyword'))
+    return render_template('booking_staff.html', from_airports=from_airports)
 
 
 def from_airport(from_airport_id):

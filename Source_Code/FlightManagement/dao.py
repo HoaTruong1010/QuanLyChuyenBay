@@ -20,9 +20,21 @@ def load_tickets():
 
 def load_from_airlines(airport_id=None, kw=None):
     query = AirLine.query.filter()
+    #
+    # if airport_id:
+    #     query = query.filter(AirLine.from_airport_id.__eq__(airport_id))
+
+    if kw:
+        query = query.filter(AirLine.name.contains(kw))
+
+    return query.all()
+
+
+def load_to_airlines(airport_id=None, kw=None):
+    query = AirLine.query.filter()
 
     if airport_id:
-        query = query.filter(AirLine.from_airport_id.__eq__(airport_id))
+        query = query.filter(AirLine.to_airport_id.__eq__(airport_id))
 
     if kw:
         query = query.filter(AirLine.name.contains(kw))
@@ -62,6 +74,7 @@ def register(name, username, password, avatar):
 def get_user_by_id(user_id):
     return User.query.get(user_id)
 
+
 # def save_receipt(cart):
 #     if cart:
 #         r = Receipt(user=current_user)
@@ -81,22 +94,21 @@ def get_user_by_id(user_id):
 #         .group_by(Category.id).order_by(Category.id).all()
 
 
-# def stats_revenue(kw=None, from_date=None, to_date=None):
-#     query = db.session.query(Product.id, Product.name, func.sum(ReceiptDetails.quantity * ReceiptDetails.price)) \
-#         .join(ReceiptDetails, ReceiptDetails.product_id.__eq__(Product.id)) \
-#         .join(Receipt, ReceiptDetails.receipt_id.__eq__(Receipt.id))
-#
-#     if kw:
-#         query = query.filter(Product.name.contains(kw))
-#
-#     if from_date:
-#         query = query.filter(Receipt.created_date.__ge__(from_date))
-#
-#     if to_date:
-#         query = query.filter(Receipt.created_date.__le__(to_date))
-#
-#     return query.group_by(Product.id).all()
+def load_search_airport(kw=None, from_airport_id=None, to_airport_id=None):
+    query = db.session.query(AirLine.id, AirLine.name, AirLine.from_airport_id, AirLine.to_airport_id) \
+        .join(AirPort, AirPort.id.__eq__(AirLine.from_airport_id)) \
+        .join(AirPort, AirPort.id__eq__(AirLine.to_airport_id))
 
+    if kw:
+        query = query.filter(AirPort.location.contains(kw))
+
+    if from_airport_id:
+        query = query.filter(AirPort.id.__eq__(from_airport_id))
+
+    if to_airport_id:
+        query = query.filter(AirPort.id.__eq__(to_airport_id))
+
+    return query.all()
 
 # if __name__ == '__main__':
 #     from FlightManagement import app
