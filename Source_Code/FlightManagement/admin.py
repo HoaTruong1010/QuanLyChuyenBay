@@ -2,6 +2,7 @@ from flask import redirect, url_for, request, flash
 from flask_admin import Admin, expose, BaseView
 from flask_admin.babel import gettext, ngettext
 from flask_admin.helpers import get_redirect_target, flash_errors
+from flask_admin.model.helpers import get_mdict_item_or_list
 from flask_login import current_user, logout_user
 from flask_wtf import FlaskForm
 from wtforms import SelectField
@@ -20,7 +21,6 @@ class Base_View(ModelView):
     can_view_details = True
     can_export = True
     # edit_modal = True
-    # details_modal = True
     page_size = 10
 
 
@@ -134,10 +134,34 @@ class FlightManagementView(AuthenticatedModelView):
     # @expose('/edit/', methods=('GET', 'POST'))
     # def edit_view(self):
     #     pass
-    #
-    # @expose('/details/')
-    # def details_view(self):
-    #     pass
+
+    @expose('/details/')
+    def details_view(self):
+        return_url = get_redirect_target() or self.get_url('.index_view')
+
+        if not self.can_view_details:
+            return redirect(return_url)
+
+        id = get_mdict_item_or_list(request.args, 'id')
+        if id is None:
+            return redirect(return_url)
+
+        model = self.get_one(id)
+
+        if model is None:
+            flash(gettext('Record does not exist.'), 'error')
+            return redirect(return_url)
+
+        apm_list = Flight_AirportMedium.query.filter(
+            Flight_AirportMedium.flight_id.__eq__(id)
+        ).all()
+
+        return self.render("admin/flight-details.html",
+                           model=model,
+                           details_columns=self._details_columns,
+                           get_value=self.get_detail_value,
+                           apm_list=apm_list,
+                           return_url=return_url)
 
 
 
@@ -156,5 +180,6 @@ class LogoutView(AuthenticatedView):
 
 admin.add_view(FlightManagementView(Flight, db.session, name="Quản lý chuyến bay", endpoint='flights'))
 admin.add_view(RegulationView(Regulation, db.session, name='Quy định'))
+admin.add_view(ModelView(Flight_AirportMedium, db.session, name='Trung gian'))
 admin.add_view(StatsView(name="Thống kê báo cáo"))
 admin.add_view(LogoutView(name="Đăng xuất"))
