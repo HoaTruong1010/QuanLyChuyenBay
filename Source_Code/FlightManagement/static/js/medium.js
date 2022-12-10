@@ -16,7 +16,7 @@ function visible_medium(isMedium) {
 
 function create_options(id) {
     let option = ''
-    fetch("/api/airport_info")
+    fetch("/api/admin/flights/new/")
     .then(res => res.json())
     .then(data => {
         data.forEach((item, index) => {
@@ -27,6 +27,21 @@ function create_options(id) {
         select_container.innerHTML = option;
     })
 }
+
+function edit_options(id) {
+    let option = ''
+    fetch("/api/admin/flights/new/")
+    .then(res => res.json())
+    .then(data => {
+        data.forEach((item, index) => {
+            option += `<option id="${index}" value="${item.name}">${item.name}</option>`
+        })
+
+        const select_container = document.getElementById(`form-edit-select-${i}`);
+        select_container.innerHTML = option;
+    })
+}
+
 
 function number_of_mediums(str_number) {
     const number = Number(str_number)

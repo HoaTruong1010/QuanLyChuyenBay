@@ -5,7 +5,8 @@ from flask_admin.helpers import get_redirect_target, flash_errors
 from flask_admin.model.helpers import get_mdict_item_or_list
 from flask_login import current_user, logout_user
 from flask_wtf import FlaskForm
-from wtforms import SelectField
+from wtforms import SelectField, StringField, DateTimeLocalField
+from wtforms.validators import InputRequired, Length
 
 from FlightManagement import utils, controllers
 
@@ -45,7 +46,15 @@ class RegulationView(AuthenticatedModelView):
     }
 
 
-class Form(FlaskForm):
+class FlightForm(FlaskForm):
+    id = StringField(name="id", validators=[InputRequired(),
+                                             Length(max=10)])
+    name = StringField(name="name", validators=[InputRequired(),
+                                             Length(max=10)])
+    departing_at = DateTimeLocalField(name="departing_at",
+                                      format="%Y-%m-%dT%H:%M", validators=[InputRequired()])
+    arriving_at = DateTimeLocalField(name="arriving_at",
+                                     format="%Y-%m-%dT%H:%M", validators=[InputRequired()])
     planes = SelectField('planes', choices=[])
     airlines = SelectField('airlines', choices=[])
 
@@ -64,17 +73,23 @@ class FlightManagementView(AuthenticatedModelView):
 
     @expose('/new/', methods=('GET', 'POST'))
     def create_view(self):
+        return_url = get_redirect_target() or self.get_url('.index_view')
+
+        if not self.can_create:
+            return redirect(return_url)
+
         sts_msg = ''
         am_msg = ''
-        form = Form()
+        form = FlightForm()
+
         form.planes.choices = [p.id for p in AirPlane.query.all()]
         form.airlines.choices = [a.name for a in AirLine.query.all()]
 
         if request.method == "POST":
-            id = request.form['id']
-            name = request.form['name']
-            departing_at = request.form['departing_at']
-            arriving_at = request.form['arriving_at']
+            id = form.id.data
+            name = form.name.data
+            departing_at = form.departing_at.data
+            arriving_at = form.arriving_at.data
             plane = form.planes.data
             airline = form.airlines.data
 
@@ -124,16 +139,64 @@ class FlightManagementView(AuthenticatedModelView):
                     else:
                         sts_msg = 'Không có số lượng sân bay trung gian'
                 except:
-                    sts_msg = "success"
+                    sts_msg = sts_msg
 
-
+                form.id.data = ""
+                form.name.data = ""
 
         return self.render('admin/flight.html', form=form,
-                           sts_msg=sts_msg, am_msg=am_msg)
+                           sts_msg=sts_msg, am_msg=am_msg, return_url=return_url)
 
-    # @expose('/edit/', methods=('GET', 'POST'))
-    # def edit_view(self):
-    #     pass
+    @expose('/edit/', methods=('GET', 'POST'))
+    def edit_view(self):
+        return_url = get_redirect_target() or self.get_url('.index_view')
+
+        if not self.can_edit:
+            return redirect(return_url)
+
+        sts_msg = ''
+        am_msg = ''
+
+        id = get_mdict_item_or_list(request.args, 'id')
+        if id is None:
+            return redirect(return_url)
+
+        model = self.get_one(id)
+
+        if model is None:
+            flash(gettext('Record does not exist.'), 'error')
+            return redirect(return_url)
+
+        form = FlightForm(obj=model)
+        medium_list = []
+
+        form.planes.choices = [p.id for p in AirPlane.query.all()]
+        form.airlines.choices = [a.name for a in AirLine.query.all()]
+
+        for apm in utils.get_apm_by_flight_id(id):
+            medium_list.append(apm)
+
+        medium_num = len(medium_list)
+
+        # if self.validate_form(form):
+        #     if self.update_model(form, model):
+        #         flash(gettext('Record was successfully saved.'), 'success')
+        #         if '_add_another' in request.form:
+        #             return redirect(self.get_url('.create_view', url=return_url))
+        #         elif '_continue_editing' in request.form:
+        #             return redirect(self.get_url('.edit_view', id=self.get_pk_value(model)))
+        #         else:
+        #             # save button
+        #             return redirect(self.get_save_return_url(model, is_created=False))
+
+        if request.method == 'GET' or form.errors:
+            self.on_form_prefill(form, id)
+
+
+        return self.render('admin/flight-edit.html', form=form, model=model,
+                           medium_num=medium_num, airports=utils.load_airports(),
+                           sts_msg=sts_msg, medium_list=medium_list,
+                           am_msg=am_msg, return_url=return_url)
 
     @expose('/details/')
     def details_view(self):
@@ -180,6 +243,5 @@ class LogoutView(AuthenticatedView):
 
 admin.add_view(FlightManagementView(Flight, db.session, name="Quản lý chuyến bay", endpoint='flights'))
 admin.add_view(RegulationView(Regulation, db.session, name='Quy định'))
-admin.add_view(ModelView(Flight_AirportMedium, db.session, name='Trung gian'))
 admin.add_view(StatsView(name="Thống kê báo cáo"))
 admin.add_view(LogoutView(name="Đăng xuất"))
