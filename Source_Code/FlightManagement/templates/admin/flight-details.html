@@ -1,0 +1,46 @@
+{% extends 'admin/model/details.html' %}
+
+{% block body %}
+  {{ super() }}
+
+  {% block apm_details_table %}
+    {% if apm_list: %}
+      {% for apm in apm_list %}
+<table class="table table-hover table-bordered searchable">
+        <tr>
+          <td>
+            <b>Trạm dừng</b>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <ul class="list-group list-group-horizontal">
+              <li class="list-group-item"><b>Tên trạm dừng:</b></li>
+              <li class="list-group-item">{{ apm.name }}</li>
+            </ul>
+            <ul class="list-group list-group-horizontal">
+              <li class="list-group-item"><b>Thời gian bắt đầu dừng:</b></li>
+              <li class="list-group-item">{{ apm.stop_time_begin }}</li>
+            </ul>
+            <ul class="list-group list-group-horizontal">
+              <li class="list-group-item"><b>Thời gian dừng kết thúc:</b></li>
+              <li class="list-group-item">{{ apm.stop_time_finish }}</li>
+            </ul>
+            <ul class="list-group list-group-horizontal">
+              <li class="list-group-item"><b>Mô tả:</b></li>
+              <li class="list-group-item">{{ apm.description }}</li>
+            </ul>
+            <ul class="list-group list-group-horizontal">
+              <li class="list-group-item"><b>Sân bay dừng:</b></li>
+              <li class="list-group-item">{{ apm.airport_medium_id }}</li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+      {% endfor %}
+    {% else %}
+<p class="text-primary"> <span class="text-secondary">Ghi chú:</span> Chuyến bay này không có trạm dừng.</p>
+    {% endif %}
+  {% endblock %}
+
+{% endblock %}

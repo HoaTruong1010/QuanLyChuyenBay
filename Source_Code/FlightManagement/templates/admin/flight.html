@@ -1,0 +1,122 @@
+{% extends 'admin/base.html' %}
+
+{% block body %}
+{% if current_user.is_authenticated %}
+<form action="" method="POST" role="form" class="admin-form" enctype="multipart/form-data">
+    <fieldset>
+        {% if sts_msg.__eq__("success") %}
+        {% if am_msg.__eq__("success") or am_msg.__eq__("")%}
+        <div class="alert alert-success">
+            Lưu thành công!
+        </div>
+        {% else %}
+        {% if am_msg != "" %}
+        <div class="alert alert-danger">
+            {{ am_msg }}
+        </div>
+        {% endif %}
+        {% endif %}
+        {% else %}
+        {% if sts_msg != "" %}
+        <div class="alert alert-danger">
+            {{ sts_msg }}
+        </div>
+        {% endif %}
+        {% endif %}
+        <div class="form-group ">
+            <label for="id" class="control-label">Mã chuyến bay
+                <strong style="color: red">*</strong>
+            </label>
+            <input class="form-control" id="id"
+                   maxlength="50" name="id" required="" type="text" value="">
+        </div>
+        <div class="form-group ">
+            <label for="name" class="control-label">Tên chuyến bay
+                <strong style="color: red">*</strong>
+            </label>
+            <input class="form-control" id="name"
+                   maxlength="50" name="name" required="" type="text" value="">
+        </div>
+        <div class="form-group ">
+            <label for="departing_at" class="control-label">Thời gian khởi hành
+                <strong style="color: red">*</strong>
+            </label>
+            <input class="form-control" id="departing_at"
+                   maxlength="50" name="departing_at" required="" type="datetime-local" value="">
+        </div>
+        <div class="form-group ">
+            <label for="arriving_at" class="control-label">Thời gian đến
+                <strong style="color: red">*</strong>
+            </label>
+            <input class="form-control" id="arriving_at"
+                   maxlength="50" name="arriving_at" required="" type="datetime-local" value="">
+        </div>
+        {{ form.csrf_token }}
+        <div class="form-group ">
+            <label class="control-label">Số hiệu máy bay
+                <strong style="color: red">*</strong>
+            </label>
+            {{ form.planes(class="form-control") }}
+        </div>
+        {{ form.csrf_token }}
+        <div class="form-group ">
+            <label class="control-label">Tuyến bay
+                <strong style="color: red">*</strong>
+            </label>
+            {{ form.airlines(class="form-control") }}
+        </div>
+
+        <hr>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" name="isMedium"
+                   id="flexSwitchCheckDefault" style="margin-left:0px" onchange="visible_medium(this)" >
+            <label class="form-check-label" for="flexSwitchCheckDefault" style="margin-left:45px">Sân bay trung
+                gian</label>
+        </div>
+        <div class="form-group ">
+            <label class="control-label">Số lượng <strong style="color: red">*</strong>
+            </label>
+            <div id='choose'>
+                <div class="form-check">
+                    <input class="form-check-input input-number" type="radio" value="1"
+                           name="number" id="1" disabled onchange="number_of_mediums(1)">
+                    <label class="form-check-label" for="1">
+                        1
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input input-number" type="radio" value="2"
+                           name="number" id="2" disabled onchange="number_of_mediums(2)">
+                    <label class="form-check-label" for="2">
+                        2
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div id="medium" class="medium"> </div>
+
+        <hr>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10 submit-row">
+                <input type="submit" class="btn btn-primary" value="Lưu">
+                <input name="_add_another" type="submit" class="btn btn-secondary" value="Lưu và thêm cái khác">
+                <a href="/admin/flights/" class="btn btn-danger" role="button">Hủy bỏ</a>
+            </div>
+        </div>
+    </fieldset>
+</form>
+{% else %}
+<h1 class="text-danger">Rất tiếc, bạn không có quyền thực thi trang này</h1>
+<h2>Quay về <a href="/" class="text-info">TRANG CHỦ</a> để ĐĂNG NHẬP</h2>
+{% endif %}
+
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/medium.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+{% endblock %}

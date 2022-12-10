@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, session, jsonify
 from FlightManagement import app, dao, utils
 from flask_login import login_user, logout_user, login_required
 from FlightManagement.decorators import anonymous_user
+from FlightManagement.models import UserRole
 import cloudinary.uploader
 
 
@@ -15,16 +16,22 @@ def index():
     return render_template('index.html', airports=airports, from_airports=from_airports, to_airports=to_airports,
                            tickets=tickets)
 
+def login_my_user():
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
 
-def login_admin():
-    username = request.form['username']
-    password = request.form['password']
+        user = utils.check_login(username=username, password=password)
+        if user:
+            login_user(user=user)
+            if user.user_role == UserRole.ADMIN:
+                return redirect('/admin')
 
-    user = dao.auth_user(username=username, password=password)
-    if user:
-        login_user(user=user)
+            return redirect(url_for("index"))
+        else:
+            err_msg = "ĐĂNG NHẬP THẤT BẠI!!!"
 
-    return redirect('/admin')
+    return render_template("index.html", err_msg=err_msg)
 
 
 def login_staff():
@@ -36,6 +43,31 @@ def login_staff():
         login_user(user=user)
 
     return redirect('/staff')
+    
+    
+def logout_my_user():
+    logout_user()
+    return redirect(url_for("index"))
+
+
+def register():
+    err_msg = ''
+    if request.method == 'POST':
+        password = request.form['password']
+        confirm = request.form['confirm']
+        if password.__eq__(confirm):
+            try:
+                utils.register(name=request.form['name'],
+                             password=password,
+                             username=request.form['username'])
+
+                return redirect('/')
+            except:
+                err_msg = 'Đã có lỗi xảy ra! Vui lòng quay lại sau!'
+        else:
+            err_msg = 'Mật khẩu KHÔNG khớp!'
+
+    return render_template('register.html', err_msg=err_msg)
 
 
 def booking():
@@ -166,3 +198,16 @@ def search_booking():
 #     session[key] = cart
 #
 #     return jsonify(utils.cart_stats(cart))
+
+
+
+def airports():
+    data = []
+
+    for a in utils.load_airports():
+        data.append({
+            'id': a.id,
+            'name': a.name
+        })
+
+    return jsonify(data)
