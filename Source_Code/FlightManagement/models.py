@@ -23,7 +23,6 @@ class User(db.Model, UserMixin):
     joined_date = Column(DateTime, default=datetime.now())
     user_role = Column(Enum(UserRole), default=UserRole.USER)
 
-
     def __str__(self):
         return str(self.id)
 
@@ -40,7 +39,6 @@ class Profile(db.Model):
     phone = Column(String(10), nullable=False)
     isSupervisor = Column(Boolean, default=False)
 
-
     def __str__(self):
         return str(self.id)
 
@@ -52,7 +50,6 @@ class AirPlane(db.Model):
     name = Column(String(50), nullable=False)
     manufacturer = Column(String(50), nullable=False)
     totalSeat = Column(Integer, nullable=False)
-
 
     def __str__(self):
         return str(self.id)
@@ -78,8 +75,8 @@ class AirPort(db.Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
+    image = Column(String(100))
     location = Column(String(100), nullable=False)
-
 
     def __str__(self):
         return str(self.name)
@@ -118,7 +115,6 @@ class Flight(db.Model):
     airlines = relationship("AirLine", foreign_keys=[airline_id], lazy=True,
                            passive_deletes = True, cascade="all, delete")
 
-
     def __str__(self):
         return str(self.name)
 
@@ -148,7 +144,7 @@ class PlaneTicket(db.Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     rank = Column(Integer, nullable=False)
-    price = Column(DECIMAL(18,2), nullable=False)
+    price = Column(DECIMAL(18, 2), nullable=False)
     date = Column(DateTime, default=datetime.now())
 
     place = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
@@ -190,11 +186,11 @@ class Regulation(db.Model):
 if __name__ == '__main__':
     with app.app_context():
         # db.drop_all()
-        # db.create_all()
-
+        db.create_all()
+        #
         # password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
         # u1 = User(name='An', username='an1100', password=password,
-        #          user_role=UserRole.USER)
+        #           user_role=UserRole.USER)
         # u2 = User(name='Binh', username='binh1211', password=password,
         #           user_role=UserRole.EMPLOYEE)
         # u3 = User(name='Dong', username='dong1100', password=password,
@@ -206,7 +202,8 @@ if __name__ == '__main__':
         #              phone='0176448394')
         # p2 = Profile(id='01232', name='Le Thi Binh', gender='nu', dob=datetime(2001, 11, 6), email='binh1211@gmail.com',
         #              phone='0176640394')
-        # p3 = Profile(id='01233', name='Tran Van Dong', gender='nam', dob=datetime(2000, 4, 17), email='dong1100@gmail.com',
+        # p3 = Profile(id='01233', name='Tran Van Dong', gender='nam', dob=datetime(2000, 4, 17),
+        #              email='dong1100@gmail.com',
         #              phone='0176470094', isSupervisor=True)
         # db.session.add_all([p1, p2, p3])
         # db.session.commit()
@@ -222,18 +219,26 @@ if __name__ == '__main__':
         # s3 = Seat(id='G3', name='Ghế 3', plane_id='MB3')
         # db.session.add_all([s1, s2, s3])
         # db.session.commit()
-        #
-        # sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội')
-        # sb2 = AirPort(name='Sân bay Tân Sơn Nhất', location='Hồ Chí Minh')
-        # sb3 = AirPort(name='Sân bay Phù Cát', location='Bình Định')
-        # sb4 = AirPort(name='Sân bay Cát Bi', location='Hải Phòng')
-        # db.session.add_all([sb1, sb2, sb3, sb4])
+
+        # sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội',
+        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/HaNoi_wkzzg5.jpg')
+        # sb2 = AirPort(name='Sân bay Tân Sơn Nhất', location='Hồ Chí Minh',
+        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266575/Airport_Location/HCM_jpkw5e.jpg')
+        # sb3 = AirPort(name='Sân bay Phù Cát', location='Bình Định',
+        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/BinhDinh_c6yrif.jpg')
+        # sb4 = AirPort(name='Sân bay Narita', location='Nhật Bản',
+        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266739/Airport_Location/NhatBan_fzo3qw.jpg')
+        # sb5 = AirPort(name='Sân bay Bangkok', location='Thái Lan',
+        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266384/Airport_Location/ThaiLan_k533hb.jpg')
+        # db.session.add_all([sb1, sb2, sb3, sb4, sb5])
         # db.session.commit()
         #
         # al1 = AirLine(id='1', name='Hà Nội - Hồ Chí Minh', from_airport_id='1', to_airport_id='2')
         # al2 = AirLine(id='2', name='Hà Nội - Bình Định', from_airport_id='1', to_airport_id='3')
         # al3 = AirLine(id='3', name='Bình Định - Hồ Chí Minh', from_airport_id='3', to_airport_id='2')
-        # db.session.add_all([al1, al2, al3])
+        # al4 = AirLine(id='4', name='Hồ Chí Minh - Nhật Bản', from_airport_id='2', to_airport_id='4')
+        # al5 = AirLine(id='5', name='Hồ Chí Minh - Thái Lan', from_airport_id='2', to_airport_id='5')
+        # db.session.add_all([al1, al2, al3, al4, al5])
         # db.session.commit()
         #
         # f1 = Flight(id='CB1', name='Chuyến bay 001', departing_at=datetime(2022, 12, 1, 13, 00, 00),
