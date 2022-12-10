@@ -22,8 +22,14 @@ def register(name, username, password):
         db.session.add(u)
         db.session.commit()
 
+
 def load_airports():
     return AirPort.query.all()
+
+def get_apm_by_flight_id(flight_id):
+    return Flight_AirportMedium.query.filter(
+        Flight_AirportMedium.flight_id.__eq__(flight_id)
+    ).all()
 
 
 def take_time(str_date, format):
@@ -44,8 +50,6 @@ def check_flight(id, name, departing_at, arriving_at, plane):
         if flight:
             msg = "Mã chuyến bay đã tồn tại"
         else:
-            departing_at = datetime.strptime(departing_at, "%Y-%m-%dT%H:%M")
-            arriving_at = datetime.strptime(arriving_at, "%Y-%m-%dT%H:%M")
             duration = arriving_at - departing_at
             rt = get_regulation_time_by_id(5)
             if rt:

@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, session, jsonify
+from flask import render_template, request, redirect, session, jsonify, url_for
 from FlightManagement import app, dao, utils
 from flask_login import login_user, logout_user, login_required
 from FlightManagement.decorators import anonymous_user
@@ -17,6 +17,7 @@ def index():
                            tickets=tickets)
 
 def login_my_user():
+    err_msg = ""
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
@@ -26,6 +27,9 @@ def login_my_user():
             login_user(user=user)
             if user.user_role == UserRole.ADMIN:
                 return redirect('/admin')
+            if user.user_role == UserRole.EMPLOYEE:
+                return redirect('/staff')
+
 
             return redirect(url_for("index"))
         else:

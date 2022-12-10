@@ -1,6 +1,6 @@
-{% extends 'admin/model/create.html' %}
+{% extends 'admin/model/edit.html' %}
 
-{% block create_form %}
+{% block edit_form %}
 {% if current_user.is_authenticated %}
 <form action="" method="POST" role="form" class="admin-form" enctype="multipart/form-data">
     <fieldset>
@@ -67,9 +67,79 @@
         </div>
 
         <hr>
+        {% block apm_details_table %}
+        {% if medium_num: %}
+        {% for i in range(medium_num) %}
+        <table class="table table-hover table-bordered searchable">
+            <tr>
+                <td>
+                    <b>Trạm dừng</b>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Tên trạm dừng</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control"
+                                   name="name-stop-{{i}}" value="{{medium_list[i].name}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Thời gian bắt đầu dừng:</label>
+                        <div class="col-sm-10">
+                            <input type="datetime-local" class="form-control"
+                                   name="time-stop-begin-{{i}}" value="{{medium_list[i].stop_time_begin}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Thời gian dừng kết thúc:</label>
+                        <div class="col-sm-10">
+                            <input type="datetime-local" class="form-control"
+                                   name="time-stop-finish-{{i}}" value="{{medium_list[i].stop_time_finish}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Mô tả:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="description-{{i}}"
+                                   value="{{medium_list[i].description}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Sân bay dừng:</label>
+                        <div class="col-sm-10">
+                            <select class="form-select" id="form-edit-select-{{i}}"
+                                    name="form-edit-select-{{i}}" aria-label="Default select example">
+                                {% for ap in airports %}
+                                {% if medium_list[i].aiports.name == ap.name %}
+                                <option selected value="{{medium_list[i].airport_medium_id}}">
+                                    {{medium_list[i].aiports.name}}
+                                </option>
+                                {% else %}
+                                <option value="{{ap.name}}">
+                                    {{ap.name}}
+                                </option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-10">
+                            <button type="submit" class="btn btn-primary">Xóa</button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        {% endfor %}
+        {% endif %}
+        {% endblock %}
+
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" name="isMedium"
-                   id="flexSwitchCheckDefault" style="margin-left:0px" onchange="visible_medium(this)" >
+                   id="flexSwitchCheckDefault" style="margin-left:0px" onchange="visible_medium(this)">
             <label class="form-check-label" for="flexSwitchCheckDefault" style="margin-left:45px">Thêm trạm dừng</label>
         </div>
         <div class="form-group ">
@@ -92,13 +162,12 @@
                 </div>
             </div>
         </div>
-        <div id="medium" class="medium"> </div>
+        <div id="medium" class="medium"></div>
 
         <hr>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10 submit-row">
                 <input type="submit" class="btn btn-primary" value="Lưu">
-                <input name="_add_another" type="submit" class="btn btn-secondary" value="Lưu và thêm cái khác">
                 <a href="/admin/flights/" class="btn btn-danger" role="button">Hủy bỏ</a>
             </div>
         </div>

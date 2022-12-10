@@ -186,8 +186,8 @@ class Regulation(db.Model):
 if __name__ == '__main__':
     with app.app_context():
         # db.drop_all()
-        db.create_all()
-        #
+        # db.create_all()
+
         # password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
         # u1 = User(name='An', username='an1100', password=password,
         #           user_role=UserRole.USER)
@@ -219,7 +219,7 @@ if __name__ == '__main__':
         # s3 = Seat(id='G3', name='Ghế 3', plane_id='MB3')
         # db.session.add_all([s1, s2, s3])
         # db.session.commit()
-
+        #
         # sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội',
         #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/HaNoi_wkzzg5.jpg')
         # sb2 = AirPort(name='Sân bay Tân Sơn Nhất', location='Hồ Chí Minh',
@@ -282,7 +282,7 @@ if __name__ == '__main__':
         #                 description='Thời gian máy bay được dừng tối đa 30 phút')
         # db.session.add_all([g1, g2, g3, g4, g5, g6, g7])
         # db.session.commit()
-
+        #
         # fam = Flight_AirportMedium.query.filter(Flight_AirportMedium.flight_id.__eq__("CB1")).first()
         # db.session.delete(fam)
         # db.session.commit()
