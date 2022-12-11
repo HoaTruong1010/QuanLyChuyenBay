@@ -26,12 +26,12 @@ def load_tickets():
     return PlaneTicket.query.all()
 
 
-# def load_from_airlines(kw=None):
-#     query = AirLine.query.filter()
-#     if kw:
-#         query = query.filter(AirLine.name.contains(kw))
-#
-#     return query.all()
+def load_from_airlines(airport_id=None, kw=None):
+    query = AirLine.query.filter()
+    if kw:
+        query = query.filter(AirLine.name.contains(kw))
+
+    return query.all()
 
 
 def load_to_airlines(airport_id=None, kw=None):

@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, session, jsonify
+from flask import render_template, request, redirect, session, jsonify, url_for
 from FlightManagement import app, dao, utils
 from flask_login import login_user, logout_user, login_required
 from FlightManagement.decorators import anonymous_user
@@ -18,6 +18,7 @@ def index():
 
 
 def login_my_user():
+    err_msg = ''
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
@@ -72,6 +73,15 @@ def register():
 
 
 def booking():
+    data = []
+
+    for a in utils.load_airports():
+        data.append({
+            'id': a.id,
+            'name': a.name
+        })
+
+    return jsonify(data)
     session['ticket'] = {
         "1": {
             "from": "Hồ Chí Minh",
