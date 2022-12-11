@@ -5,7 +5,8 @@ from flask_admin.helpers import get_redirect_target, flash_errors
 from flask_admin.model.helpers import get_mdict_item_or_list
 from flask_login import current_user, logout_user
 from flask_wtf import FlaskForm
-from wtforms import SelectField
+from wtforms import SelectField, StringField, DateTimeLocalField
+from wtforms.validators import InputRequired, Length
 
 from FlightManagement import utils, controllers
 
@@ -45,7 +46,13 @@ class RegulationView(AuthenticatedModelView):
     }
 
 
-class Form(FlaskForm):
+class FlightForm(FlaskForm):
+    id = StringField(name="id", validators=[InputRequired(), Length(max=10)])
+    name = StringField(name="name", validators=[InputRequired(), Length(max=50)])
+    departing_at = DateTimeLocalField(name="departing_at", format="%Y-%m-%dT%H:%M",
+                                      validators=[InputRequired()])
+    arriving_at = DateTimeLocalField(name="arriving_at", format="%Y-%m-%dT%H:%M",
+                                     validators=[InputRequired()])
     planes = SelectField('planes', choices=[])
     airlines = SelectField('airlines', choices=[])
 
@@ -64,17 +71,23 @@ class FlightManagementView(AuthenticatedModelView):
 
     @expose('/new/', methods=('GET', 'POST'))
     def create_view(self):
+        return_url = get_redirect_target() or self.get_url('.index_view')
+
+        if not self.can_create:
+            return redirect(return_url)
+
         sts_msg = ''
         am_msg = ''
-        form = Form()
+        form = FlightForm()
+
         form.planes.choices = [p.id for p in AirPlane.query.all()]
         form.airlines.choices = [a.name for a in AirLine.query.all()]
 
         if request.method == "POST":
-            id = request.form['id']
-            name = request.form['name']
-            departing_at = request.form['departing_at']
-            arriving_at = request.form['arriving_at']
+            id = form.id.data
+            name = form.name.data
+            departing_at = form.departing_at.data
+            arriving_at = form.arriving_at.data
             plane = form.planes.data
             airline = form.airlines.data
 
@@ -105,35 +118,194 @@ class FlightManagementView(AuthenticatedModelView):
                             am_des = request.form[str_des]
                             am_ap = request.form[str_ap]
                             am_msg = utils.check_airport_medium(am_name, am_stb,
-                                                                 am_stf, airline, am_ap, id)
+                                                                am_stf, airline,
+                                                                am_ap, id)
                             if am_msg == 'success':
                                 try:
                                     utils.save_airport_medium(am_name, am_stb,
-                                                             am_stf, am_des,
-                                                             id, am_ap)
+                                                              am_stf, am_des,
+                                                              id, am_ap)
                                 except:
-                                    f = Flight.query.get(id)
-                                    db.session.delete(f)
-                                    db.session.commit()
+                                    utils.del_flight(id)
                                     am_msg = 'Đã có lỗi xảy ra khi lưu sân bay trung gian! Vui lòng quay lại sau!'
                             else:
-                                f = Flight.query.get(id)
-                                db.session.delete(f)
-                                db.session.commit()
+                                utils.del_flight(id)
                                 am_msg = am_msg
                     else:
                         sts_msg = 'Không có số lượng sân bay trung gian'
                 except:
-                    sts_msg = "success"
+                    sts_msg = sts_msg
 
-
+                form.id.data = ""
+                form.name.data = ""
 
         return self.render('admin/flight.html', form=form,
-                           sts_msg=sts_msg, am_msg=am_msg)
+                           sts_msg=sts_msg, am_msg=am_msg, return_url=return_url)
 
-    # @expose('/edit/', methods=('GET', 'POST'))
-    # def edit_view(self):
-    #     pass
+    @expose('/edit/', methods=('GET', 'POST'))
+    def edit_view(self):
+        return_url = get_redirect_target() or self.get_url('.index_view')
+
+        if not self.can_edit:
+            return redirect(return_url)
+
+        sts_msg = ''
+        am_msg = ''
+        am_edit_msg = ''
+
+        id = get_mdict_item_or_list(request.args, 'id')
+        if id is None:
+            return redirect(return_url)
+
+        model = self.get_one(id)
+
+        if model is None:
+            flash(gettext('Record does not exist.'), 'error')
+            return redirect(return_url)
+
+        old_model = model
+        old_airline = old_model.airlines.name
+        form = FlightForm(obj=model)
+        medium_list = []
+
+        form.planes.choices = [p.id for p in AirPlane.query.all()]
+        form.airlines.choices = [a.name for a in AirLine.query.all()]
+
+        for apm in utils.get_apm_by_flight_id(id):
+            medium_list.append(apm)
+
+        medium_num = len(medium_list)
+
+        if request.method == "POST":
+            f_id = form.id.data
+            name = form.name.data
+            departing_at = form.departing_at.data
+            arriving_at = form.arriving_at.data
+            plane = form.planes.data
+            airline = form.airlines.data
+
+            if departing_at != model.departing_at or arriving_at != model.arriving_at or plane != model.plane_id:
+                sts_msg = utils.check_flight_follow_regulation(departing_at, arriving_at, plane)
+            else:
+                sts_msg = "success"
+
+            if f_id != model.id and Flight.query.filter(Flight.id.__eq__(f_id.strip())).first():
+                sts_msg = "Mã chuyến bay đã tồn tại! Vui lòng đổi sang nội dung khác!"
+
+            if sts_msg == 'success':
+                try:
+                    utils.update_flight(model, f_id, name, departing_at, arriving_at, plane, airline)
+                except:
+                    sts_msg = 'Đã có lỗi xảy ra khi cập nhật chuyến bay! Vui lòng quay lại sau!'
+
+                medium_list = []
+                for apm in utils.get_apm_by_flight_id(model.id):
+                    medium_list.append(apm)
+                medium_num = len(medium_list)
+
+                if medium_num > 0:
+                    for i in range(medium_num):
+                        str_del_am = "del-" + str(i)
+
+                        if str_del_am in request.form:
+                            utils.del_apm(medium_list[i].flight_id, medium_list[i].airport_medium_id)
+                            return redirect(self.get_url('.edit_view', id=self.get_pk_value(model)))
+                        else:
+                            str_edit_name = "ns-" + str(i)
+                            str_edit_stb = "stb-" + str(i)
+                            str_edit_stf = "stf-" + str(i)
+                            str_edit_des = "d-" + str(i)
+                            str_edit_ap = "form-edit-select-" + str(i)
+                            am_edit_name = request.form[str_edit_name]
+                            am_edit_stb = datetime.strptime(request.form[str_edit_stb], "%Y-%m-%dT%H:%M")
+                            am_edit_stf = datetime.strptime(request.form[str_edit_stf], "%Y-%m-%dT%H:%M")
+                            am_edit_des = request.form[str_edit_des]
+                            am_edit_ap = request.form[str_edit_ap]
+
+
+                            if am_edit_stb != medium_list[i].stop_time_begin or \
+                                am_edit_stf != medium_list[i].stop_time_finish or \
+                                    am_edit_ap != medium_list[i].aiports.name or \
+                                    airline != old_airline:
+                                am_edit_msg = utils.check_apm_follow_regulation(
+                                    am_edit_stb, am_edit_stf, airline, am_edit_ap, f_id
+                                )
+                            else:
+                                am_edit_msg = "success"
+
+                            if am_edit_msg == 'success':
+                                try:
+                                    utils.update_apm(
+                                        medium_list[i], am_edit_name, am_edit_stb,
+                                        am_edit_stf, am_edit_des, f_id, am_edit_ap
+                                    )
+                                except:
+                                    utils.update_flight(model, old_model.id, old_model.name,
+                                                        old_model.departing_at, old_model.arriving_at,
+                                                        old_model.plane_id, old_airline)
+                                    am_edit_msg = 'Đã có lỗi xảy ra khi cập nhật trạm dừng! Vui lòng quay lại sau!'
+                            else:
+                                try:
+                                    utils.update_flight(model, old_model.id, old_model.name,
+                                                        old_model.departing_at, old_model.arriving_at,
+                                                        old_model.plane_id, old_airline)
+                                except:
+                                    sts_msg = 'Đã có lỗi xảy ra khi cập nhật chuyến bay! Vui lòng quay lại sau!'
+                                am_edit_msg = am_edit_msg
+
+                try:
+                    is_apm = request.form['isMedium']
+
+                    if is_apm == 'on':
+                        am_number = request.form['number']
+                        num = int(am_number)
+                        for i in range(num):
+                            str_name = "name-stop-" + str(i)
+                            str_stb = "stop-time-begin-" + str(i)
+                            str_stf = "stop-time-finish-" + str(i)
+                            str_des = "description-" + str(i)
+                            str_ap = "form-select-" + str(i)
+
+                            am_name = request.form[str_name]
+                            am_stb = datetime.strptime(request.form[str_stb], "%Y-%m-%dT%H:%M")
+                            am_stf = datetime.strptime(request.form[str_stf], "%Y-%m-%dT%H:%M")
+                            am_des = request.form[str_des]
+                            am_ap = request.form[str_ap]
+                            am_msg = utils.check_airport_medium(am_name, am_stb,
+                                                                 am_stf, airline, am_ap, model.id)
+                            if am_msg == 'success':
+                                try:
+                                    utils.save_airport_medium(am_name, am_stb,
+                                                             am_stf, am_des,
+                                                             model.id, am_ap)
+                                except:
+                                    utils.update_flight(model, old_model.id, old_model.name,
+                                                        old_model.departing_at, old_model.arriving_at,
+                                                        old_model.plane_id, old_airline)
+                                    am_msg = 'Đã có lỗi xảy ra khi lưu trạm dừng! Vui lòng quay lại sau!'
+                            else:
+                                utils.update_flight(model, old_model.id, old_model.name,
+                                                    old_model.departing_at, old_model.arriving_at,
+                                                    old_model.plane_id, old_airline)
+                                am_msg = am_msg
+                    else:
+                        sts_msg = 'Không có số lượng sân bay trung gian'
+                except:
+                    sts_msg = sts_msg
+
+            if sts_msg == 'success':
+                if am_edit_msg == 'success' or am_edit_msg == '':
+                    if am_msg == 'success' or am_msg == '':
+                        flash(gettext('Record was successfully saved.'), 'success')
+                        return redirect(self.get_url('.details_view', id=request.args.get('id'), url=return_url))
+
+        if request.method == 'GET' or form.errors:
+            self.on_form_prefill(form, model.id)
+
+        return self.render('admin/flight-edit.html', form=form, model=model,
+                           medium_num=medium_num, airports=utils.load_airports(),
+                           sts_msg=sts_msg, medium_list=medium_list,
+                           am_msg=am_msg, am_edit_msg=am_edit_msg, return_url=return_url)
 
     @expose('/details/')
     def details_view(self):
@@ -164,11 +336,12 @@ class FlightManagementView(AuthenticatedModelView):
                            return_url=return_url)
 
 
-
 class StatsView(AuthenticatedView):
     @expose('/')
     def index(self):
-        return self.render('admin/stats.html')
+        year = request.args.get('year', datetime.now().year)
+        return self.render('admin/stats.html',
+                           statistics=utils.statistic_ticket_follow_month(year=year))
 
 
 class LogoutView(AuthenticatedView):
@@ -180,6 +353,5 @@ class LogoutView(AuthenticatedView):
 
 admin.add_view(FlightManagementView(Flight, db.session, name="Quản lý chuyến bay", endpoint='flights'))
 admin.add_view(RegulationView(Regulation, db.session, name='Quy định'))
-admin.add_view(ModelView(Flight_AirportMedium, db.session, name='Trung gian'))
 admin.add_view(StatsView(name="Thống kê báo cáo"))
 admin.add_view(LogoutView(name="Đăng xuất"))

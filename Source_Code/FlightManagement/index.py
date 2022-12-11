@@ -2,10 +2,10 @@ from FlightManagement.admin import *
 from FlightManagement import app, login, utils, controllers
 
 app.add_url_rule('/', 'index', controllers.index)
-app.add_url_rule('/', 'login', controllers.login_my_user, methods=['get', 'post'])
-app.add_url_rule('/logout', 'logout', controllers.login_my_user)
+app.add_url_rule('/', 'login', controllers.login_my_user, methods=['get','post'])
+app.add_url_rule('/logout', 'logout', controllers.logout_my_user)
 app.add_url_rule('/register', 'register', controllers.register, methods=['get', 'post'])
-app.add_url_rule('/api/airport_info', 'add-flight', controllers.airports)
+app.add_url_rule('/api/admin/flights/new/', 'add-flight', controllers.airports)
 app.add_url_rule('/booking', 'booking', controllers.booking)
 app.add_url_rule('/booking_staff', 'booking_staff', controllers.booking_staff)
 app.add_url_rule('/search_booking', 'search_booking', controllers.search_booking)

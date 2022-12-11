@@ -18,7 +18,7 @@ def index():
 
 
 def login_my_user():
-    err_msg = ''
+    err_msg = ""
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
@@ -28,6 +28,9 @@ def login_my_user():
             login_user(user=user)
             if user.user_role == UserRole.ADMIN:
                 return redirect('/admin')
+            if user.user_role == UserRole.EMPLOYEE:
+                return redirect('/staff')
+
 
             return redirect(url_for("index"))
         else:

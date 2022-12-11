@@ -64,7 +64,7 @@ class Seat(db.Model):
     name = Column(String(50), nullable=False)
     status = Column(Boolean, default=False)
 
-    plane_id = Column(String(10), ForeignKey(AirPlane.id, ondelete="CASCADE"), nullable=False)
+    plane_id = Column(String(10), ForeignKey(AirPlane.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
     planes = relationship("AirPlane", foreign_keys=[plane_id], lazy=True,
                           passive_deletes=True, cascade="all, delete")
 
@@ -90,7 +90,7 @@ class AirLine(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(100), nullable=False)
 
-    from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
+    from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"),nullable=False)
     to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
 
     from_airport = relationship("AirPort", foreign_keys=[from_airport_id], lazy=True,
@@ -110,8 +110,8 @@ class Flight(db.Model):
     departing_at = Column(DateTime, nullable=False)
     arriving_at = Column(DateTime, nullable=False)
 
-    plane_id = (Column(String(10), ForeignKey(AirPlane.id, ondelete="CASCADE"), nullable=False))
-    airline_id = (Column(String(10), ForeignKey(AirLine.id, ondelete="CASCADE"), nullable=False))
+    plane_id = (Column(String(10), ForeignKey(AirPlane.id, ondelete="CASCADE", onupdate="cascade"), nullable=False))
+    airline_id = (Column(String(10), ForeignKey(AirLine.id, ondelete="CASCADE", onupdate="cascade"), nullable=False))
     planes = relationship("AirPlane", foreign_keys=[plane_id], lazy=True,
                           passive_deletes=True, cascade="all, delete")
     airlines = relationship("AirLine", foreign_keys=[airline_id], lazy=True,
@@ -129,8 +129,8 @@ class Flight_AirportMedium(db.Model):
     stop_time_finish = Column(DateTime, nullable=False)
     description = Column(Text)
 
-    flight_id = Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE"), primary_key=True)
-    airport_medium_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), primary_key=True)
+    flight_id = Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE", onupdate="cascade"), primary_key=True)
+    airport_medium_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), primary_key=True)
 
     flights = relationship("Flight", foreign_keys=[flight_id], lazy=True,
                            passive_deletes=True, cascade="all, delete")
@@ -149,11 +149,11 @@ class PlaneTicket(db.Model):
     price = Column(DECIMAL(18, 2), nullable=False)
     date = Column(DateTime, default=datetime.now())
 
-    place = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
-    profile_id = (Column(Integer, ForeignKey(Profile.serial, ondelete="CASCADE"), nullable=False))
-    flight_id = (Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE"), nullable=False))
-    seat_id = (Column(String(10), ForeignKey(Seat.id, ondelete="CASCADE"), nullable=False))
-    user_id = (Column(Integer, ForeignKey(User.id, ondelete="CASCADE"), nullable=True))
+    place = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"))
+    profile_id = (Column(Integer, ForeignKey(Profile.serial, ondelete="CASCADE", onupdate="cascade"), nullable=False))
+    flight_id = (Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE", onupdate="cascade"), nullable=False))
+    seat_id = (Column(String(10), ForeignKey(Seat.id, ondelete="CASCADE", onupdate="cascade"), nullable=False))
+    user_id = (Column(Integer, ForeignKey(User.id, ondelete="CASCADE", onupdate="cascade"), nullable=True))
 
     places = relationship("AirPort", foreign_keys=[place], lazy=True,
                           cascade="all, delete", passive_deletes=True)
@@ -188,8 +188,8 @@ class Regulation(db.Model):
 if __name__ == '__main__':
     with app.app_context():
         # db.drop_all()
-        db.create_all()
-        #
+        # db.create_all()
+
         # password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
         # u1 = User(name='An', username='an1100', password=password,
         #           user_role=UserRole.USER)
@@ -221,7 +221,7 @@ if __name__ == '__main__':
         # s3 = Seat(id='G3', name='Ghế 3', plane_id='MB3')
         # db.session.add_all([s1, s2, s3])
         # db.session.commit()
-
+        #
         # sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội',
         #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/HaNoi_wkzzg5.jpg')
         # sb2 = AirPort(name='Sân bay Tân Sơn Nhất', location='Hồ Chí Minh',
@@ -284,7 +284,7 @@ if __name__ == '__main__':
         #                 description='Thời gian máy bay được dừng tối đa 30 phút')
         # db.session.add_all([g1, g2, g3, g4, g5, g6, g7])
         # db.session.commit()
-
+        #
         # fam = Flight_AirportMedium.query.filter(Flight_AirportMedium.flight_id.__eq__("CB1")).first()
         # db.session.delete(fam)
         # db.session.commit()
