@@ -76,15 +76,7 @@ def register():
 
 
 def booking():
-    data = []
 
-    for a in utils.load_airports():
-        data.append({
-            'id': a.id,
-            'name': a.name
-        })
-
-    return jsonify(data)
     session['ticket'] = {
         "1": {
             "from": "Hồ Chí Minh",
@@ -109,7 +101,12 @@ def booking():
         }
     }
     airports = dao.load_airports()
-    return render_template('booking.html', airports=airports)
+    flights = []
+    for f in dao.load_flights():
+        flights.append(f)
+    flights_num = len(flights)
+
+    return render_template('booking.html', airports=airports, flights=flights, flights_num=flights_num)
 
 
 # def search_result():
@@ -267,6 +264,22 @@ def pay():
 #     session[key] = cart
 #
 #     return jsonify(utils.cart_stats(cart))
+
+
+def load_flights():
+    data = []
+
+    for a in dao.load_flights():
+        data.append({
+            'departing_at': a.departing_at,
+            'arriving_at': a.arriving_at,
+            'plane_id': a.plane_id,
+            'airlines': {
+                'name': a.airlines.name
+            }
+        })
+
+    return jsonify(data)
 
 
 def airports():

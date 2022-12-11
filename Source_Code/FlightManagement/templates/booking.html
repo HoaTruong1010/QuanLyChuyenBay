@@ -178,50 +178,35 @@
     </div>
     <span class="content-header">Các chuyến bay với giá siêu ưu đãi từ Afforda</span>
     <div class="row" style="margin-top:20px">
-        <div class="flex flex-row places">
+        <div class="places">
             <div class="col-sm-4">
                 <span>Từ</span>
-                <input type="text" class="form-control" list="f_airports" name="from"
-                       placeholder="Chọn nơi đi...">
+                <input type="text" class="form-control" id="from" list="f_airports" name="from"
+                       placeholder="Chọn nơi đi..." onkeyup="filter_details_ticket()">
                 <datalist id="fr_airports">
                     {% for a in airports %}<option value="{{ a.location }}">{% endfor %}
                 </datalist>
             </div>
 
-            <div class="col-sm-4">
-                <span>Đến</span>
-                <input type="text" class="form-control" list="t_airports" name="to"
-                       placeholder="Chọn nơi đến...">
-                <datalist id="to_airports">
-                    {% for a in airports %}<option value="{{ a.location }}">{% endfor %}
-                </datalist>
-            </div>
-
-            <div class="col-sm-4">
-                <span>Ngân sách</span>
-                <input type="text" class="form-control" name="nsach" placeholder="Ngân sách tối đa">
-            </div>
         </div>
     </div>
     <div class="flex flex-wrap flex-row" style="margin-top:20px; width:100%">
         <table class="table border-table">
             <thead class="header-table">
                 <tr>
-                <th>Từ</th>
-                <th>Đến</th>
-                <th>Hạng vé</th>
-                <th>Ngày khởi hành</th>
-                <th>Giá</th>
+                <th>Tuyen bay</th>
+                <th>May bay</th>
+                <th>Thoi gian khoi hanh</th>
+                <th>Thoi gian ket thuc</th>
             </tr>
             </thead>
-            <tbody>
-                {% for t in session['ticket'].values() %}
+            <tbody id="filter_flight" >
+                {% for i in range(flights_num)%}
                 <tr>
-                    <td>{{ t.from }}</td>
-                    <td>{{ t.to }}</td>
-                    <td>{{ t.rank }}</td>
-                    <td>{{ t.fdate }}</td>
-                    <td>{{ "{:,.0f}".format(t.price) }} VNĐ</td>
+                    <td>{{flights[i].airlines.name}}</td>
+                    <td>{{flights[i].plane_id}}</td>
+                    <td>{{flights[i].departing_at}}</td>
+                    <td>{{flights[i].arriving_at}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -229,4 +214,7 @@
         </table>
     </div>
 </section>
+
+<script src="{{ url_for('static', filename='js/bookticket.js') }}"></script>
+
 {% endblock %}
