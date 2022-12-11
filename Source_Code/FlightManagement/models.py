@@ -6,6 +6,7 @@ from flask_login import UserMixin
 import hashlib
 from datetime import datetime, time, timedelta
 
+
 class UserRole(UserEnum):
     USER = 1
     EMPLOYEE = 2
@@ -50,6 +51,7 @@ class AirPlane(db.Model):
     name = Column(String(50), nullable=False)
     manufacturer = Column(String(50), nullable=False)
     totalSeat = Column(Integer, nullable=False)
+    image = Column(String(100))
 
     def __str__(self):
         return str(self.id)
@@ -64,7 +66,7 @@ class Seat(db.Model):
 
     plane_id = Column(String(10), ForeignKey(AirPlane.id, ondelete="CASCADE"), nullable=False)
     planes = relationship("AirPlane", foreign_keys=[plane_id], lazy=True,
-                           passive_deletes = True, cascade="all, delete")
+                          passive_deletes=True, cascade="all, delete")
 
     def __str__(self):
         return str(self.id)
@@ -88,13 +90,13 @@ class AirLine(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(100), nullable=False)
 
-    from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"),nullable=False)
+    from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
     to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
 
     from_airport = relationship("AirPort", foreign_keys=[from_airport_id], lazy=True,
-                           passive_deletes = True, cascade="all, delete")
+                                passive_deletes=True, cascade="all, delete")
     to_airport = relationship("AirPort", foreign_keys=[to_airport_id], lazy=True,
-                           passive_deletes = True, cascade="all, delete")
+                              passive_deletes=True, cascade="all, delete")
 
     def __str__(self):
         return str(self.name)
@@ -111,9 +113,9 @@ class Flight(db.Model):
     plane_id = (Column(String(10), ForeignKey(AirPlane.id, ondelete="CASCADE"), nullable=False))
     airline_id = (Column(String(10), ForeignKey(AirLine.id, ondelete="CASCADE"), nullable=False))
     planes = relationship("AirPlane", foreign_keys=[plane_id], lazy=True,
-                           passive_deletes = True, cascade="all, delete")
+                          passive_deletes=True, cascade="all, delete")
     airlines = relationship("AirLine", foreign_keys=[airline_id], lazy=True,
-                           passive_deletes = True, cascade="all, delete")
+                            passive_deletes=True, cascade="all, delete")
 
     def __str__(self):
         return str(self.name)
@@ -131,9 +133,9 @@ class Flight_AirportMedium(db.Model):
     airport_medium_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), primary_key=True)
 
     flights = relationship("Flight", foreign_keys=[flight_id], lazy=True,
-                           passive_deletes = True, cascade="all, delete")
+                           passive_deletes=True, cascade="all, delete")
     aiports = relationship("AirPort", foreign_keys=[airport_medium_id], lazy=True,
-                           passive_deletes = True, cascade="all, delete")
+                           passive_deletes=True, cascade="all, delete")
 
     def __str__(self):
         return str(self.name)
@@ -154,15 +156,15 @@ class PlaneTicket(db.Model):
     user_id = (Column(Integer, ForeignKey(User.id, ondelete="CASCADE"), nullable=True))
 
     places = relationship("AirPort", foreign_keys=[place], lazy=True,
-                           cascade = "all, delete", passive_deletes = True)
+                          cascade="all, delete", passive_deletes=True)
     profiles = relationship("Profile", foreign_keys=[profile_id], lazy=True,
-                           cascade = "all, delete", passive_deletes = True)
+                            cascade="all, delete", passive_deletes=True)
     flights = relationship("Flight", foreign_keys=[flight_id], lazy=True,
-                           cascade = "all, delete", passive_deletes = True)
+                           cascade="all, delete", passive_deletes=True)
     seats = relationship("Seat", foreign_keys=[seat_id], lazy=True,
-                           cascade = "all, delete", passive_deletes = True)
+                         cascade="all, delete", passive_deletes=True)
     users = relationship("User", foreign_keys=[user_id], lazy=True,
-                           cascade = "all, delete", passive_deletes = True)
+                         cascade="all, delete", passive_deletes=True)
 
     def __str__(self):
         return str(self.id)

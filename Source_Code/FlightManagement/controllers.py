@@ -71,6 +71,29 @@ def register():
 
 
 def booking():
+    session['ticket'] = {
+        "1": {
+            "from": "Hồ Chí Minh",
+            "to": "Thái Lan",
+            "rank": "1",
+            "fdate": "11/12/2022",
+            "price": 3000000
+        },
+        "2": {
+            "from": "Hà Nội",
+            "to": "Nhật Bản",
+            "rank": "2",
+            "fdate": "11/12/2022",
+            "price": 1500000
+        },
+        "3": {
+            "from": "Hồ Chí Minh",
+            "to": "Bình Định",
+            "rank": "2",
+            "fdate": "11/12/2022",
+            "price": 500000
+        }
+    }
     airports = dao.load_airports()
     return render_template('booking.html', airports=airports)
 
@@ -133,23 +156,32 @@ def search_booking():
 #         return jsonify({'status': 200})
 
 
-# def cart():
-#     # session['cart'] = {
-#     #     "1": {
-#     #         "id": "1",
-#     #         "name": "iPhone 13",
-#     #         "price": 12000,
-#     #         "quantity": 2
-#     #     },
-#     #     "2": {
-#     #         "id": "2",
-#     #         "name": "iPhone 14",
-#     #         "price": 15000,
-#     #         "quantity": 1
-#     #     }
-#     # }
+# def ticket():
+#     session['ticket'] = {
+#         "1": {
+#             "from": "Hồ Chí Minh",
+#             "to": "Thái Lan",
+#             "rank": "1",
+#             "from-date": "11/12/2022",
+#             "price": 3000000
+#         },
+#         "2": {
+#             "from": "Hồ Chí Minh",
+#             "to": "Nhật Bản",
+#             "rank": "2",
+#             "from-date": "11/12/2022",
+#             "price": 1500000
+#         },
+#         "3": {
+#             "from": "Hồ Chí Minh",
+#             "to": "Bình Định",
+#             "rank": "2",
+#             "from-date": "11/12/2022",
+#             "price": 500000
+#         }
+#     }
 #
-#     return render_template('cart.html')
+#     return render_template('booking.html')
 
 
 # def add_to_cart():
