@@ -168,45 +168,44 @@ def search_booking():
 #     return render_template('details.html', airline=a)
 
 
-# @login_required
-# def pay():
-#     key = app.config['CART_KEY']
-#     cart = session.get(key)
-#
-#     try:
-#         dao.save_receipt(cart)
-#     except:
-#         return jsonify({'status': 500})
-#     else:
-#         return jsonify({'status': 200})
+def cart():
+    session['cart'] = {
+        "1": {
+            "id": "1",
+            "name": "Saki Guen",
+            "from": "Hà Nội",
+            "to": "Nhật Bản",
+            "rank": "2",
+            "fdate": "11/12/2022",
+            "price": 1500000,
+            "seat": "G1"
+        },
+        "2": {
+            "id": "2",
+            "name": "Nhi Nguyen",
+            "from": "Hồ Chí Minh",
+            "to": "Thái Lan",
+            "rank": "1",
+            "fdate": "11/12/2022",
+            "price": 1500000,
+            "seat": "G2"
+        }
+    }
+
+    return render_template('cart.html')
 
 
-# def ticket():
-#     session['ticket'] = {
-#         "1": {
-#             "from": "Hồ Chí Minh",
-#             "to": "Thái Lan",
-#             "rank": "1",
-#             "from-date": "11/12/2022",
-#             "price": 3000000
-#         },
-#         "2": {
-#             "from": "Hồ Chí Minh",
-#             "to": "Nhật Bản",
-#             "rank": "2",
-#             "from-date": "11/12/2022",
-#             "price": 1500000
-#         },
-#         "3": {
-#             "from": "Hồ Chí Minh",
-#             "to": "Bình Định",
-#             "rank": "2",
-#             "from-date": "11/12/2022",
-#             "price": 500000
-#         }
-#     }
-#
-#     return render_template('booking.html')
+@login_required
+def pay():
+    key = app.config['CART_KEY']
+    cart = session.get(key)
+
+    try:
+        dao.save_receipt(cart)
+    except:
+        return jsonify({'status': 500})
+    else:
+        return jsonify({'status': 200})
 
 
 # def add_to_cart():
