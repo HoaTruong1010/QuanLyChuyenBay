@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from flask import redirect, url_for, request, flash
 from flask_admin import Admin, expose, BaseView
 from flask_admin.babel import gettext, ngettext
@@ -339,9 +341,16 @@ class FlightManagementView(AuthenticatedModelView):
 class StatsView(AuthenticatedView):
     @expose('/')
     def index(self):
-        year = request.args.get('year', datetime.now().year)
+        total = Decimal(0)
+        airline_name = request.args.get('airline_name')
+        date = request.args.get('month')
+        statistics = utils.statistic_revenue_follow_month(airline_name=airline_name,
+                                                          date=date)
+        for s in statistics:
+            if s[2]:
+                total = total + s[2]
         return self.render('admin/stats.html',
-                           statistics=utils.statistic_ticket_follow_month(year=year))
+                           statistics=statistics, total=total)
 
 
 class LogoutView(AuthenticatedView):

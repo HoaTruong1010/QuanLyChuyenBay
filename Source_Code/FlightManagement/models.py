@@ -249,7 +249,9 @@ if __name__ == '__main__':
         #             arriving_at=datetime(2022, 12, 1, 19, 00, 00), plane_id='MB2', airline_id='2')
         # f3 = Flight(id='CB3', name='Chuyến bay 003', departing_at=datetime(2022, 12, 1, 9, 00, 00),
         #             arriving_at=datetime(2022, 12, 1, 9, 50, 00), plane_id='MB3', airline_id='3')
-        # db.session.add_all([f1, f2, f3])
+        # f4 = Flight(id='CB4', name='Chuyến bay 004', departing_at=datetime(2022, 12, 11, 9, 00, 00),
+        #             arriving_at=datetime(2022, 12, 11, 18, 50, 00), plane_id='MB2', airline_id='3')
+        # db.session.add_all([f1, f2, f3, f4])
         # db.session.commit()
         #
         # fam1 = Flight_AirportMedium(name='Tram dung 1', stop_time_begin=datetime(2022, 12, 1, 13, 10, 00),

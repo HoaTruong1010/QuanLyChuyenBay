@@ -1,4 +1,5 @@
 from sqlalchemy import func
+from sqlalchemy.sql.functions import percentile_cont
 
 from FlightManagement.models import *
 from FlightManagement import db
@@ -11,12 +12,14 @@ from datetime import datetime
 def get_user_by_id(user_id):
     return User.query.get(user_id)
 
+
 def check_login(username, password):
     if username and password:
         password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
 
         return User.query.filter(User.username.__eq__(username.strip()),
                                  User.password.__eq__(password)).first()
+
 
 def register(name, username, password):
     if name and username and password:
@@ -28,6 +31,7 @@ def register(name, username, password):
 
 def load_airports():
     return AirPort.query.all()
+
 
 def get_apm_by_flight_id(flight_id):
     return Flight_AirportMedium.query.filter(
@@ -175,8 +179,17 @@ def update_apm(model, name, stop_time_begin, stop_time_finish, description, flig
     db.session.commit()
 
 
-def statistic_ticket_follow_month(year):
-    return db.session.query(extract('month', PlaneTicket.date),
-                            func.sum(PlaneTicket.price))\
-        .filter(extract('year', PlaneTicket.date) == year)\
-        .group_by(extract('month', PlaneTicket.date)).all()
+def statistic_revenue_follow_month(airline_name=None, date=None):
+    stats =  db.session.query(AirLine.id, AirLine.name, func.sum(PlaneTicket.price), func.count(Flight.id))\
+            .join(Flight, Flight.airline_id.__eq__(AirLine.id), isouter=True)\
+            .join(PlaneTicket, PlaneTicket.flight_id.__eq__(Flight.id), isouter=True)\
+            .group_by(AirLine.id, AirLine.name)
+
+    if airline_name and date:
+        date = datetime.strptime(date, "%Y-%m")
+        stats = stats.filter(AirLine.name.contains(airline_name))
+        stats = stats.filter(extract('year', PlaneTicket.date) == date.year,
+                             extract('month',PlaneTicket.date) == date.month)
+
+
+    return stats.all()
