@@ -23,54 +23,57 @@
         </div>
         {% endif %}
         {% endif %}
-        {{ form.csrf_token }}
-        <div class="form-group ">
-            <label class="control-label">Mã chuyến bay
-                <strong style="color: red">*</strong>
-            </label>
-            {{ form.id(class="form-control") }}
-        </div>
-        {{ form.csrf_token }}
-        <div class="form-group ">
-            <label class="control-label">Tên chuyến bay
-                <strong style="color: red">*</strong>
-            </label>
-            {{ form.name(class="form-control") }}
-        </div>
-        {{ form.csrf_token }}
-        <div class="form-group ">
-            <label class="control-label">Thời gian khởi hành
-                <strong style="color: red">*</strong>
-            </label>
-            {{ form.departing_at(class="form-control") }}
-        </div>
-        {{ form.csrf_token }}
-        <div class="form-group ">
-            <label class="control-label">Thời gian đến
-                <strong style="color: red">*</strong>
-            </label>
-            {{ form.arriving_at(class="form-control") }}
-        </div>
-        {{ form.csrf_token }}
-        <div class="form-group ">
-            <label class="control-label">Số hiệu máy bay
-                <strong style="color: red">*</strong>
-            </label>
-            {{ form.planes(class="form-control") }}
-        </div>
-        {{ form.csrf_token }}
-        <div class="form-group ">
-            <label class="control-label">Tuyến bay
-                <strong style="color: red">*</strong>
-            </label>
-            {{ form.airlines(class="form-control") }}
+
+        <div class="flight-form">
+            {{ form.csrf_token }}
+            <div class="form-group ">
+                <label class="control-label">Mã chuyến bay
+                    <strong style="color: red">*</strong>
+                </label>
+                {{ form.id(class="form-control", id="id") }}
+            </div>
+            {{ form.csrf_token }}
+            <div class="form-group ">
+                <label class="control-label">Tên chuyến bay
+                    <strong style="color: red">*</strong>
+                </label>
+                {{ form.name(class="form-control") }}
+            </div>
+            {{ form.csrf_token }}
+            <div class="form-group ">
+                <label class="control-label">Thời gian khởi hành
+                    <strong style="color: red">*</strong>
+                </label>
+                {{ form.departing_at(class="form-control") }}
+            </div>
+            {{ form.csrf_token }}
+            <div class="form-group ">
+                <label class="control-label">Thời gian đến
+                    <strong style="color: red">*</strong>
+                </label>
+                {{ form.arriving_at(class="form-control") }}
+            </div>
+            {{ form.csrf_token }}
+            <div class="form-group ">
+                <label class="control-label">Số hiệu máy bay
+                    <strong style="color: red">*</strong>
+                </label>
+                {{ form.planes(class="form-control") }}
+            </div>
+            {{ form.csrf_token }}
+            <div class="form-group ">
+                <label class="control-label">Tuyến bay
+                    <strong style="color: red">*</strong>
+                </label>
+                {{ form.airlines(class="form-control") }}
+            </div>
         </div>
 
         <hr>
         {% block apm_details_table %}
         {% if medium_num: %}
         {% for i in range(medium_num) %}
-        <table class="table table-hover table-bordered searchable">
+        <table class="table table-hover table-bordered searchable" id="stop-{{i}}">
             <tr>
                 <td>
                     <b>Trạm dừng</b>
@@ -82,27 +85,27 @@
                         <label class="col-sm-2 col-form-label">Tên trạm dừng</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control"
-                                   name="name-stop-{{i}}" value="{{medium_list[i].name}}">
+                                   name="ns-{{i}}" value="{{medium_list[i].name}}">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Thời gian bắt đầu dừng:</label>
                         <div class="col-sm-10">
                             <input type="datetime-local" class="form-control"
-                                   name="time-stop-begin-{{i}}" value="{{medium_list[i].stop_time_begin}}">
+                                   name="stb-{{i}}" value="{{medium_list[i].stop_time_begin}}">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Thời gian dừng kết thúc:</label>
                         <div class="col-sm-10">
                             <input type="datetime-local" class="form-control"
-                                   name="time-stop-finish-{{i}}" value="{{medium_list[i].stop_time_finish}}">
+                                   name="stf-{{i}}" value="{{medium_list[i].stop_time_finish}}">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Mô tả:</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" name="description-{{i}}"
+                            <input type="text" class="form-control" name="d-{{i}}"
                                    value="{{medium_list[i].description}}">
                         </div>
                     </div>
@@ -113,7 +116,7 @@
                                     name="form-edit-select-{{i}}" aria-label="Default select example">
                                 {% for ap in airports %}
                                 {% if medium_list[i].aiports.name == ap.name %}
-                                <option selected value="{{medium_list[i].airport_medium_id}}">
+                                <option selected value="{{medium_list[i].aiports.name}}">
                                     {{medium_list[i].aiports.name}}
                                 </option>
                                 {% else %}
@@ -127,7 +130,7 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-10">
-                            <button type="submit" class="btn btn-primary">Xóa</button>
+                            <button name="del-{{i}}" class="btn btn-primary">Xóa</button>
                         </div>
                     </div>
                 </td>
@@ -137,6 +140,8 @@
         {% endif %}
         {% endblock %}
 
+        {% block create_apm %}
+        {% if medium_num < 2: %}
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" name="isMedium"
                    id="flexSwitchCheckDefault" style="margin-left:0px" onchange="visible_medium(this)">
@@ -148,21 +153,26 @@
             <div id='choose'>
                 <div class="form-check">
                     <input class="form-check-input input-number" type="radio" value="1"
-                           name="number" id="1" disabled onchange="number_of_mediums(1)">
+                           name="number" id="1" disabled onchange="number_of_mediums(1, this)">
                     <label class="form-check-label" for="1">
                         1
                     </label>
                 </div>
+                {% if medium_num < 1:%}
                 <div class="form-check">
                     <input class="form-check-input input-number" type="radio" value="2"
-                           name="number" id="2" disabled onchange="number_of_mediums(2)">
+                           name="number" id="2" disabled onchange="number_of_mediums(2, this)">
                     <label class="form-check-label" for="2">
                         2
                     </label>
                 </div>
+                {% endif %}
             </div>
         </div>
         <div id="medium" class="medium"></div>
+        {% endif%}
+        {% endblock %}
+
 
         <hr>
         <div class="form-group">

@@ -1,3 +1,10 @@
+function visible_id_flight(medium_num) {
+    if(medium_num > 0) {
+        document.getElementById("id").setAttribute("disabled", "")
+    }
+}
+
+
 function visible_medium(isMedium) {
     let number_items = document.getElementsByClassName("input-number")
     if(isMedium.checked) {
@@ -9,7 +16,7 @@ function visible_medium(isMedium) {
             number_items[i].checked = false
             number_items[i].setAttribute("disabled", "")
         }
-        document.getElementById("medium").style.display = "none"
+        document.getElementById("medium").innerHTML = ""
     }
 }
 
@@ -24,20 +31,6 @@ function create_options(id) {
         })
 
         const select_container = document.getElementById(`form-select-${id}`);
-        select_container.innerHTML = option;
-    })
-}
-
-function edit_options(id) {
-    let option = ''
-    fetch("/api/admin/flights/new/")
-    .then(res => res.json())
-    .then(data => {
-        data.forEach((item, index) => {
-            option += `<option id="${index}" value="${item.name}">${item.name}</option>`
-        })
-
-        const select_container = document.getElementById(`form-edit-select-${i}`);
         select_container.innerHTML = option;
     })
 }
@@ -72,9 +65,7 @@ function number_of_mediums(str_number) {
                            maxlength="50" name="stop-time-finish-${i}" type="datetime-local" value="">
                 </div>
                 <div class="form-group ">
-                    <label for="description-${i}" class="control-label">Mô tả
-                        <strong style="color: red">*</strong>
-                    </label>
+                    <label for="description-${i}" class="control-label">Mô tả</label>
                     <input class="form-control" id="description-${i}"
                            maxlength="200" name="description-${i}" type="text" value="">
                 </div>
