@@ -28,10 +28,6 @@ def load_tickets():
 
 def load_from_airlines(airport_id=None, kw=None):
     query = AirLine.query.filter()
-    #
-    # if airport_id:
-    #     query = query.filter(AirLine.from_airport_id.__eq__(airport_id))
-
     if kw:
         query = query.filter(AirLine.name.contains(kw))
 
@@ -83,24 +79,24 @@ def get_user_by_id(user_id):
     return User.query.get(user_id)
 
 
-# def save_receipt(cart):
-#     if cart:
-#         r = Receipt(user=current_user)
-#         db.session.add(r)
-#
-#         for c in cart.values():
-#             d = ReceiptDetails(quantity=c['quantity'], price=c['price'],
-#                                receipt=r, product_id=c['id'])
-#             db.session.add(d)
-#
-#         db.session.commit()
+def save_receipt(cart):
+    if cart:
+        p = Profile(user=current_user)
+        db.session.add(p)
+
+        for c in cart.values():
+            pt = PlaneTicket(rank=c['rank'], price=c['price'], seat_id=c['seat'],
+                             place=c['from'] + c['to'], profile=p)
+            db.session.add(pt)
+
+        db.session.commit()
 
 
-def count_result_by_airline():
-    return db.session.query(AirPort.id, AirPort.location, func.count(AirLine.id)) \
-        .join(AirLine, AirLine.from_airport_id.__eq__(AirPort.id), isouter=True) \
-        .join(AirLine, AirLine.to_airport_id.__eq__(AirPort.id), isouter=True) \
-        .group_by(AirLine.id).order_by(AirLine.id).all()
+# def count_result_by_airline():
+#     return db.session.query(AirPort.id, AirPort.location, func.count(AirLine.id)) \
+#         .join(AirLine, AirLine.from_airport_id.__eq__(AirPort.id), isouter=True) \
+#         .join(AirLine, AirLine.to_airport_id.__eq__(AirPort.id), isouter=True) \
+#         .group_by(AirLine.id).order_by(AirLine.id).all()
 
 
 def load_search_airport(kw=None, from_airport_id=None, to_airport_id=None):

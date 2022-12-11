@@ -9,6 +9,8 @@ app.add_url_rule('/api/admin/flights/new/', 'add-flight', controllers.airports)
 app.add_url_rule('/booking', 'booking', controllers.booking)
 app.add_url_rule('/booking_staff', 'booking_staff', controllers.booking_staff)
 app.add_url_rule('/search_booking', 'search_booking', controllers.search_booking)
+app.add_url_rule('/cart', 'cart', controllers.cart)
+app.add_url_rule('/api/pay', 'pay', controllers.pay)
 
 
 @login.user_loader

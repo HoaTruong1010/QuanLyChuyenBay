@@ -16,6 +16,7 @@ def index():
     return render_template('index.html', airports=airports, from_airports=from_airports, to_airports=to_airports,
                            tickets=tickets)
 
+
 def login_my_user():
     err_msg = ""
     if request.method == "POST":
@@ -47,8 +48,8 @@ def login_staff():
         login_user(user=user)
 
     return redirect('/staff')
-    
-    
+
+
 def logout_my_user():
     logout_user()
     return redirect(url_for("index"))
@@ -62,8 +63,8 @@ def register():
         if password.__eq__(confirm):
             try:
                 utils.register(name=request.form['name'],
-                             password=password,
-                             username=request.form['username'])
+                               password=password,
+                               username=request.form['username'])
 
                 return redirect('/')
             except:
@@ -75,6 +76,38 @@ def register():
 
 
 def booking():
+    data = []
+
+    for a in utils.load_airports():
+        data.append({
+            'id': a.id,
+            'name': a.name
+        })
+
+    return jsonify(data)
+    session['ticket'] = {
+        "1": {
+            "from": "Hồ Chí Minh",
+            "to": "Thái Lan",
+            "rank": "1",
+            "fdate": "11/12/2022",
+            "price": 3000000
+        },
+        "2": {
+            "from": "Hà Nội",
+            "to": "Nhật Bản",
+            "rank": "2",
+            "fdate": "11/12/2022",
+            "price": 1500000
+        },
+        "3": {
+            "from": "Hồ Chí Minh",
+            "to": "Bình Định",
+            "rank": "2",
+            "fdate": "11/12/2022",
+            "price": 500000
+        }
+    }
     airports = dao.load_airports()
     return render_template('booking.html', airports=airports)
 
@@ -99,10 +132,33 @@ def booking():
 
 
 def booking_staff():
+    session['ticket'] = {
+        "1": {
+            "from": "Hồ Chí Minh",
+            "to": "Thái Lan",
+            "rank": "1",
+            "fdate": "11/12/2022",
+            "price": 3000000
+        },
+        "2": {
+            "from": "Hà Nội",
+            "to": "Nhật Bản",
+            "rank": "2",
+            "fdate": "11/12/2022",
+            "price": 1500000
+        },
+        "3": {
+            "from": "Hồ Chí Minh",
+            "to": "Bình Định",
+            "rank": "2",
+            "fdate": "11/12/2022",
+            "price": 500000
+        }
+    }
     airports = dao.load_airports()
-    from_airports = dao.load_from_airlines(airport_id=request.args.get("airport_id"),
-                                           kw=request.args.get('keyword'))
-    return render_template('booking_staff.html', airports=airports, from_airports=from_airports)
+    # from_airports = dao.load_from_airlines(airport_id=request.args.get("airport_id"),
+    #                                        kw=request.args.get('keyword'))
+    return render_template('booking_staff.html', airports=airports)
 
 
 def from_airport(from_airport_id):
@@ -119,41 +175,50 @@ def search_booking():
     return render_template('search_booking.html', airports=airports, airlines=airlines,
                            airplanes=airplanes, flights=flights, tickets=tickets)
 
+
 # def booking_ticket(airline_id):
 #     a = dao.get_airline_by_id(airline_id)
 #     return render_template('details.html', airline=a)
 
 
-# @login_required
-# def pay():
-#     key = app.config['CART_KEY']
-#     cart = session.get(key)
-#
-#     try:
-#         dao.save_receipt(cart)
-#     except:
-#         return jsonify({'status': 500})
-#     else:
-#         return jsonify({'status': 200})
+def cart():
+    session['cart'] = {
+        "1": {
+            "id": "1",
+            "name": "Saki Guen",
+            "from": "Hà Nội",
+            "to": "Nhật Bản",
+            "rank": "2",
+            "fdate": "11/12/2022",
+            "price": 1500000,
+            "seat": "G1"
+        },
+        "2": {
+            "id": "2",
+            "name": "Nhi Nguyen",
+            "from": "Hồ Chí Minh",
+            "to": "Thái Lan",
+            "rank": "1",
+            "fdate": "11/12/2022",
+            "price": 1500000,
+            "seat": "G2"
+        }
+    }
+
+    return render_template('cart.html')
 
 
-# def cart():
-#     # session['cart'] = {
-#     #     "1": {
-#     #         "id": "1",
-#     #         "name": "iPhone 13",
-#     #         "price": 12000,
-#     #         "quantity": 2
-#     #     },
-#     #     "2": {
-#     #         "id": "2",
-#     #         "name": "iPhone 14",
-#     #         "price": 15000,
-#     #         "quantity": 1
-#     #     }
-#     # }
-#
-#     return render_template('cart.html')
+@login_required
+def pay():
+    key = app.config['CART_KEY']
+    cart = session.get(key)
+
+    try:
+        dao.save_receipt(cart)
+    except:
+        return jsonify({'status': 500})
+    else:
+        return jsonify({'status': 200})
 
 
 # def add_to_cart():
@@ -202,7 +267,6 @@ def search_booking():
 #     session[key] = cart
 #
 #     return jsonify(utils.cart_stats(cart))
-
 
 
 def airports():
