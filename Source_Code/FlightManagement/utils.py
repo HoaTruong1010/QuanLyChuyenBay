@@ -35,6 +35,15 @@ def get_apm_by_flight_id(flight_id):
     ).all()
 
 
+def del_apm(flight_id, airport_id):
+    apm = Flight_AirportMedium.query.filter(
+        Flight_AirportMedium.flight_id.__eq__(flight_id),
+        Flight_AirportMedium.airport_medium_id.__eq__(airport_id)
+    ).first()
+    db.session.delete(apm)
+    db.session.commit()
+
+
 def del_flight(flight_id):
     f = Flight.query.get(flight_id)
     db.session.delete(f)

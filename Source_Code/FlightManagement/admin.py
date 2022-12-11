@@ -204,19 +204,24 @@ class FlightManagementView(AuthenticatedModelView):
                 medium_num = len(medium_list)
 
                 if medium_num > 0:
-                    try:
-                        for i in range(medium_num):
+                    for i in range(medium_num):
+                        str_del_am = "del-" + str(i)
+
+                        if str_del_am in request.form:
+                            utils.del_apm(medium_list[i].flight_id, medium_list[i].airport_medium_id)
+                            return redirect(self.get_url('.edit_view', id=self.get_pk_value(model)))
+                        else:
                             str_edit_name = "ns-" + str(i)
                             str_edit_stb = "stb-" + str(i)
                             str_edit_stf = "stf-" + str(i)
                             str_edit_des = "d-" + str(i)
                             str_edit_ap = "form-edit-select-" + str(i)
-
                             am_edit_name = request.form[str_edit_name]
                             am_edit_stb = datetime.strptime(request.form[str_edit_stb], "%Y-%m-%dT%H:%M")
                             am_edit_stf = datetime.strptime(request.form[str_edit_stf], "%Y-%m-%dT%H:%M")
                             am_edit_des = request.form[str_edit_des]
                             am_edit_ap = request.form[str_edit_ap]
+
 
                             if am_edit_stb != medium_list[i].stop_time_begin or \
                                 am_edit_stf != medium_list[i].stop_time_finish or \
@@ -247,8 +252,6 @@ class FlightManagementView(AuthenticatedModelView):
                                 except:
                                     sts_msg = 'Đã có lỗi xảy ra khi cập nhật chuyến bay! Vui lòng quay lại sau!'
                                 am_edit_msg = am_edit_msg
-                    except:
-                        sts_msg = sts_msg
 
                 try:
                     is_apm = request.form['isMedium']
@@ -294,7 +297,7 @@ class FlightManagementView(AuthenticatedModelView):
                 if am_edit_msg == 'success' or am_edit_msg == '':
                     if am_msg == 'success' or am_msg == '':
                         flash(gettext('Record was successfully saved.'), 'success')
-                        return redirect(self.get_url('.details_view'))
+                        return redirect(self.get_url('.details_view', id=request.args.get('id'), url=return_url))
 
         if request.method == 'GET' or form.errors:
             self.on_form_prefill(form, model.id)
