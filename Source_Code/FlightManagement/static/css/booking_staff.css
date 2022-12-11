@@ -1,3 +1,13 @@
+.form-infocustomer {
+    width: 45%;
+    margin-top: 20px;
+}
+
+.form-infocustomer span {
+    color: #055c81;
+    font-size: 20px;
+}
+
 .subHeader {
     margin-bottom: 1rem;
     font-weight: 500;

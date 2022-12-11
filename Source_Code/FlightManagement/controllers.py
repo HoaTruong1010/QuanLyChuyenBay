@@ -16,6 +16,7 @@ def index():
     return render_template('index.html', airports=airports, from_airports=from_airports, to_airports=to_airports,
                            tickets=tickets)
 
+
 def login_my_user():
     if request.method == "POST":
         username = request.form['username']
@@ -43,8 +44,8 @@ def login_staff():
         login_user(user=user)
 
     return redirect('/staff')
-    
-    
+
+
 def logout_my_user():
     logout_user()
     return redirect(url_for("index"))
@@ -58,8 +59,8 @@ def register():
         if password.__eq__(confirm):
             try:
                 utils.register(name=request.form['name'],
-                             password=password,
-                             username=request.form['username'])
+                               password=password,
+                               username=request.form['username'])
 
                 return redirect('/')
             except:
@@ -118,10 +119,33 @@ def booking():
 
 
 def booking_staff():
+    session['ticket'] = {
+        "1": {
+            "from": "Hồ Chí Minh",
+            "to": "Thái Lan",
+            "rank": "1",
+            "fdate": "11/12/2022",
+            "price": 3000000
+        },
+        "2": {
+            "from": "Hà Nội",
+            "to": "Nhật Bản",
+            "rank": "2",
+            "fdate": "11/12/2022",
+            "price": 1500000
+        },
+        "3": {
+            "from": "Hồ Chí Minh",
+            "to": "Bình Định",
+            "rank": "2",
+            "fdate": "11/12/2022",
+            "price": 500000
+        }
+    }
     airports = dao.load_airports()
-    from_airports = dao.load_from_airlines(airport_id=request.args.get("airport_id"),
-                                           kw=request.args.get('keyword'))
-    return render_template('booking_staff.html', airports=airports, from_airports=from_airports)
+    # from_airports = dao.load_from_airlines(airport_id=request.args.get("airport_id"),
+    #                                        kw=request.args.get('keyword'))
+    return render_template('booking_staff.html', airports=airports)
 
 
 def from_airport(from_airport_id):
@@ -137,6 +161,7 @@ def search_booking():
     tickets = dao.load_tickets()
     return render_template('search_booking.html', airports=airports, airlines=airlines,
                            airplanes=airplanes, flights=flights, tickets=tickets)
+
 
 # def booking_ticket(airline_id):
 #     a = dao.get_airline_by_id(airline_id)
@@ -230,7 +255,6 @@ def search_booking():
 #     session[key] = cart
 #
 #     return jsonify(utils.cart_stats(cart))
-
 
 
 def airports():
