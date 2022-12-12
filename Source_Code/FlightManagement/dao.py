@@ -62,6 +62,10 @@ def get_to_airport_by_id(to_airport_id):
     return AirLine.query.get(to_airport_id)
 
 
+def get_flight_by_id(flight_id):
+    return Flight.query.get(flight_id)
+
+
 def auth_user(username, password):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     return User.query.filter(User.username.__eq__(username.strip()),

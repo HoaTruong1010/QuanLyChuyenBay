@@ -90,8 +90,13 @@ class AirLine(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(100), nullable=False)
 
+<<<<<<< HEAD
+    from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
+    to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
+=======
     from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"),nullable=False)
     to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
+>>>>>>> 3f33d7fa7d5474510dd0a79823bd81a726e7d6cd
 
     from_airport = relationship("AirPort", foreign_keys=[from_airport_id], lazy=True,
                                 passive_deletes=True, cascade="all, delete")
@@ -130,12 +135,13 @@ class Flight_AirportMedium(db.Model):
     description = Column(Text)
 
     flight_id = Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE", onupdate="cascade"), primary_key=True)
-    airport_medium_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), primary_key=True)
+    airport_medium_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"),
+                               primary_key=True)
 
     flights = relationship("Flight", foreign_keys=[flight_id], lazy=True,
                            passive_deletes=True, cascade="all, delete")
-    aiports = relationship("AirPort", foreign_keys=[airport_medium_id], lazy=True,
-                           passive_deletes=True, cascade="all, delete")
+    airports = relationship("AirPort", foreign_keys=[airport_medium_id], lazy=True,
+                            passive_deletes=True, cascade="all, delete")
 
     def __str__(self):
         return str(self.name)
@@ -202,7 +208,8 @@ if __name__ == '__main__':
 
         # p1 = Profile(id='01231', name='Nguyen Van An', gender='nam', dob=datetime(2002,1,1), email='an1100@gmail.com',
         #              phone='0176448394')
-        # p2 = Profile(id='01232', name='Le Thi Binh', gender='nu', dob=datetime(2001, 11, 6), email='binh1211@gmail.com',
+        # p2 = Profile(id='01232', name='Le Thi Binh', gender='nu', dob=datetime(2001, 11, 6),
+        # email='binh1211@gmail.com',
         #              phone='0176640394')
         # p3 = Profile(id='01233', name='Tran Van Dong', gender='nam', dob=datetime(2000, 4, 17),
         #              email='dong1100@gmail.com',

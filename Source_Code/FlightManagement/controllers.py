@@ -8,13 +8,8 @@ import cloudinary.uploader
 
 def index():
     airports = dao.load_airports()
-    from_airports = dao.load_from_airlines(airport_id=request.args.get("airport_id"),
-                                           kw=request.args.get('keyword'))
-    to_airports = dao.load_to_airlines(airport_id=request.args.get("airport_id"),
-                                       kw=request.args.get("keyword"))
-    tickets = dao.load_tickets()
-    return render_template('index.html', airports=airports, from_airports=from_airports, to_airports=to_airports,
-                           tickets=tickets)
+    flight = dao.load_flights()
+    return render_template('index.html', airports=airports, flight=flight)
 
 
 def login_my_user():
@@ -30,7 +25,6 @@ def login_my_user():
                 return redirect('/admin')
             if user.user_role == UserRole.EMPLOYEE:
                 return redirect('/staff')
-
 
             return redirect(url_for("index"))
         else:
@@ -76,7 +70,6 @@ def register():
 
 
 def booking():
-
     session['ticket'] = {
         "1": {
             "from": "Hồ Chí Minh",
@@ -176,6 +169,11 @@ def search_booking():
 # def booking_ticket(airline_id):
 #     a = dao.get_airline_by_id(airline_id)
 #     return render_template('details.html', airline=a)
+
+
+def details(flight_id):
+    f = dao.get_flight_by_id(flight_id)
+    return render_template('detail.html', flight=f)
 
 
 def cart():

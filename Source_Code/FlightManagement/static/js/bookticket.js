@@ -5,12 +5,13 @@ function filter_details_ticket() {
     .then(res => res.json())
     .then(data => {
         data.forEach((item, index) => {
-            if(item.airlines.name.toLowerCase().includes(str)) {
+            if(item.airlines.name.toLowerCase().includes(str.toLowerCase())) {
                  h += `<tr>
                     <td id="${index}" value="${item.name}">${item.airlines.name}</td>
                     <td id="${index}" value="${item.plane_id}">${item.plane_id}</td>
                     <td id="${index}" value="${item.departing_at}">${item.departing_at}</td>
                     <td id="${index}" value="${item.arriving_at}">${item.arriving_at}</td>
+                    <td id="${index}" value="${item.id}">${item.id}</td>
                 </tr>`
             }
         })
