@@ -90,13 +90,8 @@ class AirLine(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(100), nullable=False)
 
-<<<<<<< HEAD
     from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
     to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
-=======
-    from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"),nullable=False)
-    to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
->>>>>>> 3f33d7fa7d5474510dd0a79823bd81a726e7d6cd
 
     from_airport = relationship("AirPort", foreign_keys=[from_airport_id], lazy=True,
                                 passive_deletes=True, cascade="all, delete")
