@@ -119,9 +119,9 @@
                             <select class="form-select" id="form-edit-select-{{i}}"
                                     name="form-edit-select-{{i}}" aria-label="Default select example">
                                 {% for ap in airports %}
-                                {% if medium_list[i].aiports.name == ap.name %}
-                                <option selected value="{{medium_list[i].aiports.name}}">
-                                    {{medium_list[i].aiports.name}}
+                                {% if medium_list[i].airports.name == ap.name %}
+                                <option selected value="{{medium_list[i].airports.name}}">
+                                    {{medium_list[i].airports.name}}
                                 </option>
                                 {% else %}
                                 <option value="{{ap.name}}">
