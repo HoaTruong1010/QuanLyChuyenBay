@@ -75,13 +75,17 @@ div.col33 {
 }
 
 .details-items {
-    justify-content: space-between;
+    justify-content: flex-start;
 }
 
 .details-header {
     font-weight: 700;
     font-size: 1.5rem;
     margin-bottom: 1rem;
+}
+
+.img-icons {
+    padding-right: 15px;
 }
 
 .img-icons img {

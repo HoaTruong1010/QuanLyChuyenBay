@@ -4,8 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8cc7a614-e245-4d2b-bfdc-1b5ace720f78" name="Changes" comment="create header and footer">
-      <change beforePath="$PROJECT_DIR$/Requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Requirements.txt" afterDir="false" />
+    <list default="true" id="8cc7a614-e245-4d2b-bfdc-1b5ace720f78" name="Changes" comment="update booking">
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_12_6_2022_2_50_AM_[Changes]/BBC_Nhom4_DeTai5.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_12_6_2022_2_50_AM_[Changes]1/BBC_Nhom4_DeTai5.docx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Bai_Bao_Cao/BBC_Nhom4_DeTai5.docx" beforeDir="false" afterPath="$PROJECT_DIR$/../Bai_Bao_Cao/BBC_Nhom4_DeTai5.docx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Bai_Bao_Cao/~$C_Nhom4_DeTai5.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlightManagement/controllers.py" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/controllers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlightManagement/static/css/content.css" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/static/css/content.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/booking_staff.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/booking_staff.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/layout/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/layout/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/layout/content.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/layout/content.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/search_booking.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/search_booking.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,18 +38,21 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2HyDhuRGiFdUmy7u9X3ocMnxJpu" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
     &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Cong_nghe_phan_mem/Thuc_Hanh/IT2002-FlaskSaleWeb/saleappv1&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+    &quot;last_opened_file_path&quot;: &quot;D:/CNTT/CNPM/IT2002-FlaskSaleWeb/saleappv2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.scopes&quot;
   }
 }</component>
   <component name="RunManager" selected="Python.index">
@@ -107,8 +121,111 @@
       <option name="project" value="LOCAL" />
       <updated>1669563209630</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="update content1">
+      <created>1670272094609</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1670272094609</updated>
+    </task>
+    <task id="LOCAL-00003" summary="update content1">
+      <created>1670276693534</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1670276693535</updated>
+    </task>
+    <task id="LOCAL-00004" summary="update content1">
+      <created>1670276734993</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1670276734993</updated>
+    </task>
+    <task id="LOCAL-00005" summary="update content1">
+      <created>1670590661841</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1670590661841</updated>
+    </task>
+    <task id="LOCAL-00006" summary="update content1">
+      <created>1670605378826</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1670605378826</updated>
+    </task>
+    <task id="LOCAL-00007" summary="update content1">
+      <created>1670613264205</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1670613264205</updated>
+    </task>
+    <task id="LOCAL-00008" summary="update content1">
+      <created>1670618072311</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1670618072311</updated>
+    </task>
+    <task id="LOCAL-00009" summary="update booking">
+      <created>1670750194867</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1670750194867</updated>
+    </task>
+    <task id="LOCAL-00010" summary="update booking">
+      <created>1670758883813</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1670758883813</updated>
+    </task>
+    <task id="LOCAL-00011" summary="update booking_staf">
+      <created>1670758991745</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1670758991745</updated>
+    </task>
+    <task id="LOCAL-00012" summary="update cart">
+      <created>1670762291806</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1670762291806</updated>
+    </task>
+    <task id="LOCAL-00013" summary="update cart">
+      <created>1670766868981</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1670766868981</updated>
+    </task>
+    <task id="LOCAL-00014" summary="update booking">
+      <created>1670772478002</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1670772478002</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="SHOW_OTHER_BRANCHES" value="true" />
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -122,7 +239,12 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="create header and footer" />
-    <option name="LAST_COMMIT_MESSAGE" value="create header and footer" />
+    <MESSAGE value="update content1" />
+    <MESSAGE value="update booking_staf" />
+    <MESSAGE value="update cart" />
+    <MESSAGE value="update booking" />
+    <option name="LAST_COMMIT_MESSAGE" value="update booking" />
   </component>
 </project>

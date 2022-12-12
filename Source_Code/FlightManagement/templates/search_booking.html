@@ -3,16 +3,26 @@
 {% block content %}
     <div class="container">
         <div class="content">
+            <div class="content-header">
+                <i class="fa-solid fa-plane"></i>
+                <span>Chuyến đi </span>
+                <br>
+                <strong>{{}}</strong>
+                <span>" tới "</span>
+                <strong>{{}}</strong>
+            </div>
             <div class="row">
 <!--                Thông tin kết quả-->
-                <div class="col-8">
-                    <div class="flex selection-header-row">
-                        <div class="header-content">
-                           <span>Kết quả</span>
+                <div class="col-sm-8">
+                    <div class="flex selection-rank">
+                        <div class="row">
+                            <div class="col-sm-4">Thông tin chuyến bay</div>
+                            <div class="col-sm-4 rank-1">Hạng 1</div>
+                            <div class="col-sm-4 rank-2">Hạng 2</div>
                         </div>
                     </div>
 
-                    <div class="result-items">
+                    <div class="flex flight-selection">
                         <div>
                             {% for f in flights %}
                             <div class="ticket-wrapper">
@@ -57,7 +67,7 @@
                 </div>
 
 <!--                Thông tin quảng cáo hoặc hình ảnh-->
-                <div class="col-4">2 of 2</div>
+                <div class="col-sm-4">2 of 2</div>
             </div>
 
         </div>
