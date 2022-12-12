@@ -3,47 +3,52 @@
 {% block content %}
 <h1 class="text-center text-success">Thông tin chi tiết chuyến bay</h1>
 
-<div class="row">
-    <div class="col-md-4 col-sm-6">
-        <img src="{{ flight.airlines.from_airport.image }}" class="img-fluid"
-             alt="{{ flight.airlines.from_airport.image }}" />
-    </div>
-    <div class="col-md-8 col-sm-6">
-        <h1>{{ flight.name }}</h1>
-        <p>Tuyến bay: {{ flight.airlines.name }}</p>
-        <p>Thời gian khởi hành: {{ flight.departing_at }}</p>
-        <p>Thời gian đến: {{ flight.arriving_at }}</p>
-        <p>Hãng bay: {{ flight.planes.manufacturer }}</p>
-<!--        <h3>{{ "{:,.1f}".format(flight.price) }} VNĐ</h3>-->
-        <form>
-            <div>
-                <label for="rank">Hạng vé</label>
-                <select name="rank" id="rank">
-                    <option value="1">Hạng 1</option>
-                    <option value="2">Hạng 2</option>
-                </select>
-            </div>
-            <div class="row" style="margin-bottom: 10px;">
-                <div class="col-md-4">
-                    <span>Người lớn</span>
-                    <input type="number" class="form-control"
-                            value="1" min="0" max="10" step="1" style="width: 100%"/>
+<div class="detail-flight">
+    <div class="row">
+        <div class="col-md-4 col-sm-6">
+            <img src="{{ flight.airlines.from_airport.image }}" class="img-fluid"
+                    alt="{{ flight.airlines.from_airport.image }}" />
+        </div>
+
+        <div class="col-md-8 col-sm-6">
+            <h1>{{ flight.name }}</h1>
+            <p>Tuyến bay: {{ flight.airlines.name }}</p>
+            <p>Khởi hành tại: {{ flight.airlines.from_airport.name }}</p>
+            <p>Thời gian đi: {{ flight.departing_at }}</p>
+            <p>Thời gian đến: {{ flight.arriving_at }}</p>
+            <p>Hãng bay: {{ flight.planes.manufacturer }}</p>
+
+            <form>
+                <div>
+                    <label for="rank">Hạng vé:</label>
+                    <select name="rank" id="rank">
+                        <option value="1">Hạng 1</option>
+                        <option value="2">Hạng 2</option>
+                    </select>
                 </div>
-                <div class="col-md-4">
-                    <span>Trẻ em</span>
-                    <span class="sub-header">(2-12 tuổi)</span>
-                    <input type="number" class="form-control"
-                            value="0" min="0" max="10" step="1" style="width: 100%"/>
+
+                <div class="row" style="margin-bottom: 10px;">
+                    <div class="col-md-4">
+                        <span>Người lớn</span>
+                        <input type="number" class="form-control"
+                                value="1" min="0" max="10" step="1" style="width: 100%"/>
+                    </div>
+                    <div class="col-md-4">
+                        <span>Trẻ em</span>
+                        <span class="sub-header">(2 - 12 tuổi)</span>
+                        <input type="number" class="form-control"
+                                value="0" min="0" max="10" step="1" style="width: 100%"/>
+                    </div>
+                    <div class="col-md-4">
+                        <span>Em bé</span>
+                        <span class="sub-header">(< 2 tuổi)</span>
+                        <input type="number" class="form-control"
+                                value="0" min="0" max="10" step="1" style="width: 100%"/>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <span>Em bé</span>
-                    <span class="sub-header">(< 2 tuổi)</span>
-                    <input type="number" class="form-control"
-                            value="0" min="0" max="10" step="1" style="width: 100%"/>
-                </div>
-            </div>
-            <button class="block curser-pointer flex flex-nowrap btn-choose">Đặt mua</button>
-        </form>
+                <button class="block curser-pointer flex flex-nowrap btn-choose" style="height: 35px">ĐẶT MUA</button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

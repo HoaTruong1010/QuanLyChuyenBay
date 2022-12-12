@@ -103,7 +103,10 @@
                     <td>{{flights[i].plane_id}}</td>
                     <td>{{flights[i].departing_at}}</td>
                     <td>{{flights[i].arriving_at}}</td>
-                    <td><button class="block curser-pointer flex flex-nowrap btn-choose">Chọn</button></td>
+                    <td>
+                        <a href="/flight/{{flights[i].id}}"
+                           class="block curser-pointer flex flex-nowrap btn-choose">Chọn</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
