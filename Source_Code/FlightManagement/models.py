@@ -90,7 +90,7 @@ class AirLine(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(100), nullable=False)
 
-    from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"),nullable=False)
+    from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
     to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
 
     from_airport = relationship("AirPort", foreign_keys=[from_airport_id], lazy=True,
@@ -130,12 +130,13 @@ class Flight_AirportMedium(db.Model):
     description = Column(Text)
 
     flight_id = Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE", onupdate="cascade"), primary_key=True)
-    airport_medium_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), primary_key=True)
+    airport_medium_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"),
+                               primary_key=True)
 
     flights = relationship("Flight", foreign_keys=[flight_id], lazy=True,
                            passive_deletes=True, cascade="all, delete")
-    aiports = relationship("AirPort", foreign_keys=[airport_medium_id], lazy=True,
-                           passive_deletes=True, cascade="all, delete")
+    airports = relationship("AirPort", foreign_keys=[airport_medium_id], lazy=True,
+                            passive_deletes=True, cascade="all, delete")
 
     def __str__(self):
         return str(self.name)

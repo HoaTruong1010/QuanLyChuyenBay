@@ -1,0 +1,55 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<h1 class="text-center text-success">THÔNG TIN ĐẶT VÉ</h1>
+
+<div class="row">
+    <div class="col-md-8 col-sm-6">
+<!--        <img src="{{ url_for('static', filename='images/layout_booking.jpg') }}" -->
+<!--             class="img-fluid" alt="{{ flight.name }}" />-->
+       <span class="content-header">Thông tin khách hàng</span>
+        <div class="form-infocustomer">
+            <form action="/" method="post">
+                <div>
+                    <span>Họ và tên khách hàng</span>
+                    <input type="text" required name="name" placeholder="Nhập tên khách hàng...">
+                </div>
+                <div>
+                    <span>Ngày tháng năm sinh</span>
+                    <input type="date" id="bday" name="birthday" class="form-control" style="width: 100%">
+                </div>
+                <div>
+                    <span>Điện thoại</span>
+                    <input type="text" required name="sdt" placeholder="Nhập số điện thoại...">
+                </div>
+                <div>
+                    <span>Email</span>
+                    <input type="text" id="mail" required name="email" placeholder="Nhập email...">
+                </div>
+                <div class="httt">
+                    <span>Hình thức thanh toán</span>
+                    <br>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" id="tienmat" name="inlineRadioOptions"
+                                value="Tiền mặt" checked>Thanh toán tiền mặt
+                        <label class="form-check-label" for="tienmat"></label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" id="visa" name="inlineRadioOptions"
+                                value="VISA">Thanh toán VISA
+                        <label class="form-check-label" for="visa"></label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <h1>{{ flight.name }}</h1>
+        <p>{{ flight.airlines.name }}</p>
+        <h3>{{ "{:,.1f}".format(.price) }} VNĐ</h3>
+        {% for t in product.tags %}
+        <span class="badge bg-success">{{t.name}}</span>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

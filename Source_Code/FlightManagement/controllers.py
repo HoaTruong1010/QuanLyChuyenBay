@@ -31,7 +31,6 @@ def login_my_user():
             if user.user_role == UserRole.EMPLOYEE:
                 return redirect('/staff')
 
-
             return redirect(url_for("index"))
         else:
             err_msg = "ĐĂNG NHẬP THẤT BẠI!!!"
@@ -76,7 +75,6 @@ def register():
 
 
 def booking():
-
     session['ticket'] = {
         "1": {
             "from": "Hồ Chí Minh",
@@ -176,6 +174,11 @@ def search_booking():
 # def booking_ticket(airline_id):
 #     a = dao.get_airline_by_id(airline_id)
 #     return render_template('details.html', airline=a)
+
+
+def details(flight_id):
+    f = dao.get_flight_by_id(flight_id)
+    return render_template('detail.html', flight=f)
 
 
 def cart():
