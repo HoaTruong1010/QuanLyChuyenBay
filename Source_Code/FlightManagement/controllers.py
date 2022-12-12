@@ -118,7 +118,7 @@ def booking():
 #         else:
 #             err_msg = 'Mật khẩu KHÔNG khớp!'
 #
-#     return render_template('search_booking.html')
+#     return render_template('confirm_booking.html')
 
 
 def booking_staff():
@@ -162,7 +162,7 @@ def search_booking():
     airplanes = dao.load_airplanes()
     flights = dao.load_flights()
     tickets = dao.load_tickets()
-    return render_template('search_booking.html', airports=airports, airlines=airlines,
+    return render_template('confirm_booking.html', airports=airports, airlines=airlines,
                            airplanes=airplanes, flights=flights, tickets=tickets)
 
 
@@ -177,20 +177,28 @@ def details(flight_id):
     return render_template('detail.html', flight=f, Flight_AirportMedium=m)
 
 
-def ticket():
-    r = int(request.args.get('rank'))
-    adult = int(request.args.get('adult'))
-    children = int(request.args.get('children'))
-    infant = int(request.args.get('infant'))
+def confirm(flight_id):
+    f = dao.get_flight_by_id(flight_id)
+    m = utils.get_apm_by_flight_id(flight_id)
+    r = int(request.form.get('rank'))
+    infant = int(request.form.get('infant'))
+    amount = 0
+    seats = []
+    try:
+        adult = int(request.form.get('adult'))
+        children = int(request.form.get('children'))
+        amount = adult+children+infant
+    except:
+        adult = children = 0
+    if amount >= dao.ts(flight_id):
+        for i in range(amount):
+            seats.append(dao.seat(flight_id))
 
 
-
-
-
+    return render_template('confirm_booking.html', flight=f, Flight_AirportMedium=m,seats=seats)
 
 
 def cart():
-
     # session['cart'] = {
     #     "1": {
     #         "id": "1",

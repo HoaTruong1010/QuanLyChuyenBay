@@ -171,7 +171,7 @@ def check_stop_station(name, begin, finish, airline, stop_airport, flight_id):
     if name and begin and finish:
         check_am_msg = check_time_stop(begin, finish, flight_id)
         if check_am_msg == 'success':
-            check_am_msg = check_airport_in_medium(airline,stop_airport, flight_id)
+            check_am_msg = check_airport_in_medium(airline, stop_airport, flight_id)
     else:
         check_am_msg = 'Thông tin trạm dừng chưa được điền đầy đủ'
     return check_am_msg
@@ -180,7 +180,7 @@ def check_stop_station(name, begin, finish, airline, stop_airport, flight_id):
 def save_airport_medium(name, min_stop, max_stop, description, flight_id, airport):
     ap = AirPort.query.filter(AirPort.name.__eq__(airport)).first()
     apm = Flight_AirportMedium(name=name, stop_time_begin=min_stop, stop_time_finish=max_stop,
-               description=description, flight_id=flight_id, airport_medium_id=ap.id)
+                               description=description, flight_id=flight_id, airport_medium_id=ap.id)
     db.session.add(apm)
     db.session.commit()
 
@@ -197,16 +197,36 @@ def update_apm(model, name, stop_time_begin, stop_time_finish, description, flig
 
 
 def statistic_revenue_follow_month(airline_name=None, date=None):
-    stats =  db.session.query(AirLine.id, AirLine.name, func.sum(PlaneTicket.price), func.count(Flight.id))\
-            .join(Flight, Flight.airline_id.__eq__(AirLine.id), isouter=True)\
-            .join(PlaneTicket, PlaneTicket.flight_id.__eq__(Flight.id), isouter=True)\
-            .group_by(AirLine.id, AirLine.name)
+    stats = db.session.query(AirLine.id, AirLine.name, func.sum(PlaneTicket.price), func.count(Flight.id)) \
+        .join(Flight, Flight.airline_id.__eq__(AirLine.id), isouter=True) \
+        .join(PlaneTicket, PlaneTicket.flight_id.__eq__(Flight.id), isouter=True) \
+        .group_by(AirLine.id, AirLine.name)
 
     if airline_name and date:
         date = datetime.strptime(date, "%Y-%m")
         stats = stats.filter(AirLine.name.contains(airline_name))
         stats = stats.filter(extract('year', PlaneTicket.date) == date.year,
-                             extract('month',PlaneTicket.date) == date.month)
-
+                             extract('month', PlaneTicket.date) == date.month)
 
     return stats.all()
+
+
+def cart_stats(cart):
+    total_amount, total_quantity = 0, 0
+
+    if cart:
+        for c in cart.values():
+            total_quantity += c['quantity']
+            total_amount += c['quantity'] * c['price']
+
+    return {
+        'total_amount': total_amount,
+        'total_quantity': total_quantity
+    }
+
+
+# if __name__ == '__main__':
+#     from FlightManagement import app
+#
+#     with app.app_context():
+#         print(get_apm_by_flight_id("CB1")[0].name)

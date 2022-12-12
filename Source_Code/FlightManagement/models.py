@@ -1,3 +1,5 @@
+import string
+
 from sqlalchemy import Column, Integer, String, Boolean, DECIMAL, ForeignKey, DateTime, Enum, Text
 from sqlalchemy.orm import relationship
 from FlightManagement import db, app
@@ -289,4 +291,6 @@ if __name__ == '__main__':
         #                 description='Thời gian máy bay được dừng tối đa 30 phút')
         # db.session.add_all([g1, g2, g3, g4, g5, g6, g7])
         # db.session.commit()
+
+
         pass

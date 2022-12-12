@@ -83,16 +83,22 @@ def get_user_by_id(user_id):
     return User.query.get(user_id)
 
 
-def seat(seat_id=None):
-    seats = db.session.query(Seat.id, Seat.name) \
-        .join(Flight, Flight.flight_id.__eq__(Flight.id), isouter=True) \
-        .group_by(Seat.id)
+def seat(flight_id=None): #khach dky ghe thanh cong
+    if flight_id:
+        seats = Seat.query.filter(Seat.flight_id.__eq__(flight_id)).all()
+        for s in seats:
+            if not s.status:
+                return s
+    return None
 
-    for s in Seat:
-        if seat_id:
-            seats = seats.filter(Seat.status.__eq__(True))
 
-    return seats.all()
+def ts(flight_id=None):  # fligt - > air
+    if flight_id:
+        amountUsed = Seat.query.filter(Seat.flight_id.__eq__(flight_id),
+                                       Seat.status.__eq__(True)).all()
+
+    fl = AirPlane.query.get(Flight.query.get(flight_id).plane_id)
+    return fl.total_seat - amountUsed
 
 
 def save_receipt(cart):
@@ -131,8 +137,9 @@ def load_search_airport(kw=None, from_airport_id=None, to_airport_id=None):
 
     return query.all()
 
-# if __name__ == '__main__':
-#     from FlightManagement import app
-#
-#     with app.app_context():
-#         print(count_product_by_cate())
+
+if __name__ == '__main__':
+    from FlightManagement import app
+
+    with app.app_context():
+        print(ts("CB1"))
