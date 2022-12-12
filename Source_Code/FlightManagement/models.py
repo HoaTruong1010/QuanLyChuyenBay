@@ -203,7 +203,8 @@ if __name__ == '__main__':
         #
         # p1 = Profile(id='01231', name='Nguyen Van An', gender='nam', dob=datetime(2002,1,1), email='an1100@gmail.com',
         #              phone='0176448394')
-        # p2 = Profile(id='01232', name='Le Thi Binh', gender='nu', dob=datetime(2001, 11, 6), email='binh1211@gmail.com',
+        # p2 = Profile(id='01232', name='Le Thi Binh', gender='nu', dob=datetime(2001, 11, 6),
+        # email='binh1211@gmail.com',
         #              phone='0176640394')
         # p3 = Profile(id='01233', name='Tran Van Dong', gender='nam', dob=datetime(2000, 4, 17),
         #              email='dong1100@gmail.com',

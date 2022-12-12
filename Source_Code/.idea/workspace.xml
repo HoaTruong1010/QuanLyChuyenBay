@@ -5,18 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8cc7a614-e245-4d2b-bfdc-1b5ace720f78" name="Changes" comment="update booking">
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_12_6_2022_2_50_AM_[Changes]/BBC_Nhom4_DeTai5.docx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_12_6_2022_2_50_AM_[Changes]1/BBC_Nhom4_DeTai5.docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Bai_Bao_Cao/BBC_Nhom4_DeTai5.docx" beforeDir="false" afterPath="$PROJECT_DIR$/../Bai_Bao_Cao/BBC_Nhom4_DeTai5.docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Bai_Bao_Cao/~$C_Nhom4_DeTai5.docx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FlightManagement/controllers.py" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/controllers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FlightManagement/static/css/content.css" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/static/css/content.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/booking_staff.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/booking_staff.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/layout/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/layout/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/layout/content.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/layout/content.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FlightManagement/templates/search_booking.html" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/templates/search_booking.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FlightManagement/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/FlightManagement/models.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -212,7 +202,14 @@
       <option name="project" value="LOCAL" />
       <updated>1670772478002</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="update booking">
+      <created>1670855025418</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1670855025418</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
