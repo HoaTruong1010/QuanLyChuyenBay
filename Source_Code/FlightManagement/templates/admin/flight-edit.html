@@ -5,23 +5,27 @@
 <form action="" method="POST" role="form" class="admin-form" enctype="multipart/form-data">
     <fieldset>
         {% if sts_msg.__eq__("success") %}
-        {% if am_msg.__eq__("success") or am_msg.__eq__("")%}
+            {% if am_edit_msg.__eq__("success") or am_edit_msg.__eq__("")%}
+                {% if am_msg.__eq__("success") or am_msg.__eq__("")%}
         <div class="alert alert-success">
             Lưu thành công!
         </div>
-        {% else %}
-        {% if am_msg != "" %}
+                {% else %}
         <div class="alert alert-danger">
             {{ am_msg }}
         </div>
-        {% endif %}
-        {% endif %}
+                {% endif %}
+            {% else %}
+        <div class="alert alert-danger">
+            {{ am_edit_msg }}
+        </div>
+            {% endif %}
         {% else %}
-        {% if sts_msg != "" %}
+            {% if sts_msg != "" %}
         <div class="alert alert-danger">
             {{ sts_msg }}
         </div>
-        {% endif %}
+            {% endif %}
         {% endif %}
 
         <div class="flight-form">

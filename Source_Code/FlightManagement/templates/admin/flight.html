@@ -5,23 +5,23 @@
 <form action="" method="POST" role="form" class="admin-form" enctype="multipart/form-data">
     <fieldset>
         {% if sts_msg.__eq__("success") %}
-        {% if am_msg.__eq__("success") or am_msg.__eq__("")%}
+            {% if am_msg.__eq__("success") or am_msg.__eq__("")%}
         <div class="alert alert-success">
             Lưu thành công!
         </div>
-        {% else %}
-        {% if am_msg != "" %}
+            {% else %}
+                {% if am_msg != "" %}
         <div class="alert alert-danger">
             {{ am_msg }}
         </div>
-        {% endif %}
-        {% endif %}
+                {% endif %}
+            {% endif %}
         {% else %}
-        {% if sts_msg != "" %}
+            {% if sts_msg != "" %}
         <div class="alert alert-danger">
             {{ sts_msg }}
         </div>
-        {% endif %}
+            {% endif %}
         {% endif %}
         {{ form.csrf_token }}
         <div class="form-group ">
@@ -98,7 +98,6 @@
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10 submit-row">
                 <input type="submit" class="btn btn-primary" value="Lưu">
-                <input name="_add_another" type="submit" class="btn btn-secondary" value="Lưu và thêm cái khác">
                 <a href="/admin/flights/" class="btn btn-danger" role="button">Hủy bỏ</a>
             </div>
         </div>

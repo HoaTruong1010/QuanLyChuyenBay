@@ -50,7 +50,7 @@ class AirPlane(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(50), nullable=False)
     manufacturer = Column(String(50), nullable=False)
-    totalSeat = Column(Integer, nullable=False)
+    total_seat = Column(Integer, nullable=False)
     image = Column(String(100))
 
     def __str__(self):
@@ -90,8 +90,13 @@ class AirLine(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(100), nullable=False)
 
+<<<<<<< HEAD
     from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
     to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
+=======
+    from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"),nullable=False)
+    to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
+>>>>>>> 3f33d7fa7d5474510dd0a79823bd81a726e7d6cd
 
     from_airport = relationship("AirPort", foreign_keys=[from_airport_id], lazy=True,
                                 passive_deletes=True, cascade="all, delete")
@@ -200,7 +205,7 @@ if __name__ == '__main__':
         #           user_role=UserRole.ADMIN)
         # db.session.add_all([u1, u2, u3])
         # db.session.commit()
-        #
+
         # p1 = Profile(id='01231', name='Nguyen Van An', gender='nam', dob=datetime(2002,1,1), email='an1100@gmail.com',
         #              phone='0176448394')
         # p2 = Profile(id='01232', name='Le Thi Binh', gender='nu', dob=datetime(2001, 11, 6),
@@ -212,9 +217,9 @@ if __name__ == '__main__':
         # db.session.add_all([p1, p2, p3])
         # db.session.commit()
         #
-        # pl1 = AirPlane(id='MB1', name='May bay 1', manufacturer='VN AirLine', totalSeat=60)
-        # pl2 = AirPlane(id='MB2', name='May bay 2', manufacturer='VN AirLine', totalSeat=70)
-        # pl3 = AirPlane(id='MB3', name='May bay 3', manufacturer='VN AirLine', totalSeat=65)
+        # pl1 = AirPlane(id='MB1', name='May bay 1', manufacturer='VN AirLine', total_seat=60)
+        # pl2 = AirPlane(id='MB2', name='May bay 2', manufacturer='VN AirLine', total_seat=70)
+        # pl3 = AirPlane(id='MB3', name='May bay 3', manufacturer='VN AirLine', total_seat=65)
         # db.session.add_all([pl1, pl2, pl3])
         # db.session.commit()
         #
@@ -251,7 +256,9 @@ if __name__ == '__main__':
         #             arriving_at=datetime(2022, 12, 1, 19, 00, 00), plane_id='MB2', airline_id='2')
         # f3 = Flight(id='CB3', name='Chuyến bay 003', departing_at=datetime(2022, 12, 1, 9, 00, 00),
         #             arriving_at=datetime(2022, 12, 1, 9, 50, 00), plane_id='MB3', airline_id='3')
-        # db.session.add_all([f1, f2, f3])
+        # f4 = Flight(id='CB4', name='Chuyến bay 004', departing_at=datetime(2022, 12, 11, 9, 00, 00),
+        #             arriving_at=datetime(2022, 12, 11, 18, 50, 00), plane_id='MB2', airline_id='3')
+        # db.session.add_all([f1, f2, f3, f4])
         # db.session.commit()
         #
         # fam1 = Flight_AirportMedium(name='Tram dung 1', stop_time_begin=datetime(2022, 12, 1, 13, 10, 00),
