@@ -11,7 +11,10 @@ function filter_details_ticket() {
                     <td id="${index}" value="${item.plane_id}">${item.plane_id}</td>
                     <td id="${index}" value="${item.departing_at}">${item.departing_at}</td>
                     <td id="${index}" value="${item.arriving_at}">${item.arriving_at}</td>
-                    <td id="${index}" value="${item.id}">${item.id}</td>
+                    <td>
+                        <a href="/flight/{{flights[i].id}}"
+                           class="block curser-pointer flex flex-nowrap btn-choose">Chọn</a>
+                    </td>
                 </tr>`
             }
         })
