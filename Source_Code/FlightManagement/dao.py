@@ -62,6 +62,10 @@ def get_to_airport_by_id(to_airport_id):
     return AirLine.query.get(to_airport_id)
 
 
+def get_flight_by_id(flight_id):
+    return Flight.query.get(flight_id)
+
+
 def auth_user(username, password):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     return User.query.filter(User.username.__eq__(username.strip()),
@@ -77,6 +81,18 @@ def register(name, username, password, avatar):
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
+
+
+def seat(seat_id=None):
+    seats = db.session.query(Seat.id, Seat.name) \
+        .join(Flight, Flight.flight_id.__eq__(Flight.id), isouter=True) \
+        .group_by(Seat.id)
+
+    for s in Seat:
+        if seat_id:
+            seats = seats.filter(Seat.status.__eq__(True))
+
+    return seats.all()
 
 
 def save_receipt(cart):

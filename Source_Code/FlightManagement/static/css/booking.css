@@ -125,6 +125,12 @@ input[type="text"], input[type="date"] {
     height: 50px;
     width: 100%;
 }
+
+.btn-choose {
+   color: #fff;
+   background: #DBA510;
+   width: 100%;
+}
 /*datalist {
   display: none;
 }*/
