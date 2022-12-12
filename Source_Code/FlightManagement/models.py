@@ -57,21 +57,6 @@ class AirPlane(db.Model):
         return str(self.id)
 
 
-class Seat(db.Model):
-    __tablename__ = 'seats'
-
-    id = Column(String(10), primary_key=True)
-    name = Column(String(50), nullable=False)
-    status = Column(Boolean, default=False)
-
-    plane_id = Column(String(10), ForeignKey(AirPlane.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
-    planes = relationship("AirPlane", foreign_keys=[plane_id], lazy=True,
-                          passive_deletes=True, cascade="all, delete")
-
-    def __str__(self):
-        return str(self.id)
-
-
 class AirPort(db.Model):
     __tablename__ = 'airports'
 
@@ -90,13 +75,8 @@ class AirLine(db.Model):
     id = Column(String(10), primary_key=True)
     name = Column(String(100), nullable=False)
 
-<<<<<<< HEAD
     from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
     to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE"), nullable=False)
-=======
-    from_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"),nullable=False)
-    to_airport_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
->>>>>>> 3f33d7fa7d5474510dd0a79823bd81a726e7d6cd
 
     from_airport = relationship("AirPort", foreign_keys=[from_airport_id], lazy=True,
                                 passive_deletes=True, cascade="all, delete")
@@ -124,6 +104,21 @@ class Flight(db.Model):
 
     def __str__(self):
         return str(self.name)
+
+
+class Seat(db.Model):
+    __tablename__ = 'seats'
+
+    id = Column(String(10), primary_key=True)
+    name = Column(String(50), nullable=False)
+    status = Column(Boolean, default=False)
+
+    flight_id = Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE", onupdate="cascade"), nullable=False)
+    flights = relationship("Flight", foreign_keys=[flight_id], lazy=True,
+                           passive_deletes=True, cascade="all, delete")
+
+    def __str__(self):
+        return str(self.id)
 
 
 class Flight_AirportMedium(db.Model):
@@ -195,7 +190,7 @@ if __name__ == '__main__':
     with app.app_context():
         # db.drop_all()
         # db.create_all()
-
+        #
         # password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
         # u1 = User(name='An', username='an1100', password=password,
         #           user_role=UserRole.USER)
@@ -205,7 +200,7 @@ if __name__ == '__main__':
         #           user_role=UserRole.ADMIN)
         # db.session.add_all([u1, u2, u3])
         # db.session.commit()
-
+        #
         # p1 = Profile(id='01231', name='Nguyen Van An', gender='nam', dob=datetime(2002,1,1), email='an1100@gmail.com',
         #              phone='0176448394')
         # p2 = Profile(id='01232', name='Le Thi Binh', gender='nu', dob=datetime(2001, 11, 6),
@@ -223,11 +218,6 @@ if __name__ == '__main__':
         # db.session.add_all([pl1, pl2, pl3])
         # db.session.commit()
         #
-        # s1 = Seat(id='G1', name='Ghế 1', plane_id='MB1')
-        # s2 = Seat(id='G2', name='Ghế 2', plane_id='MB2')
-        # s3 = Seat(id='G3', name='Ghế 3', plane_id='MB3')
-        # db.session.add_all([s1, s2, s3])
-        # db.session.commit()
         #
         # sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội',
         #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/HaNoi_wkzzg5.jpg')
@@ -261,6 +251,12 @@ if __name__ == '__main__':
         # db.session.add_all([f1, f2, f3, f4])
         # db.session.commit()
         #
+        # s1 = Seat(id='G1', name='Ghế 1', flight_id='CB1')
+        # s2 = Seat(id='G2', name='Ghế 2', flight_id='CB2')
+        # s3 = Seat(id='G3', name='Ghế 3', flight_id='CB3')
+        # db.session.add_all([s1, s2, s3])
+        # db.session.commit()
+        #
         # fam1 = Flight_AirportMedium(name='Tram dung 1', stop_time_begin=datetime(2022, 12, 1, 13, 10, 00),
         #                             stop_time_finish=datetime(2022, 12, 1, 13, 35, 00),
         #                             description="CB được nghỉ tại đây 20 phút", flight_id='CB1',
@@ -292,9 +288,5 @@ if __name__ == '__main__':
         # g7 = Regulation(name='max_stop', value='00:30:00',
         #                 description='Thời gian máy bay được dừng tối đa 30 phút')
         # db.session.add_all([g1, g2, g3, g4, g5, g6, g7])
-        # db.session.commit()
-        #
-        # fam = Flight_AirportMedium.query.filter(Flight_AirportMedium.flight_id.__eq__("CB1")).first()
-        # db.session.delete(fam)
         # db.session.commit()
         pass

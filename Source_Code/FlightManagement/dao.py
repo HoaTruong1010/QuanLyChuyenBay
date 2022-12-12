@@ -83,6 +83,18 @@ def get_user_by_id(user_id):
     return User.query.get(user_id)
 
 
+def seat(seat_id=None):
+    seats = db.session.query(Seat.id, Seat.name) \
+        .join(Flight, Flight.flight_id.__eq__(Flight.id), isouter=True) \
+        .group_by(Seat.id)
+
+    for s in Seat:
+        if seat_id:
+            seats = seats.filter(Seat.status.__eq__(True))
+
+    return seats.all()
+
+
 def save_receipt(cart):
     if cart:
         p = Profile(user=current_user)
