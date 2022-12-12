@@ -66,24 +66,30 @@ def get_regulation_time_by_id(id):
     return take_time(date.get_value(), "%H:%M:%S")
 
 
-def check_flight_follow_regulation(departing_at, arriving_at, plane):
+def check_time_flight(departing_at, arriving_at):
     duration = arriving_at - departing_at
     rt = get_regulation_time_by_id(5)
     if rt:
         if duration.total_seconds() > rt.total_seconds():
-            planes = Flight.query.filter(Flight.plane_id.__eq__(plane)).all()
-            if planes:
-                for p in planes:
-                    if arriving_at < p.departing_at or p.arriving_at < departing_at:
-                        msg = "success"
-                    else:
-                        msg = "Máy bay đã có lịch bay trong khoảng thời gian này"
-            else:
-                msg = "success"
+            msg = "success"
         else:
             msg = "Thời gian bay chưa đạt tối thiểu"
     else:
-        msg = "Hiện không có quy định về thời gian bay tối thiểu"
+        msg = "Hiện chưa có quy định về thời gian bay tối thiểu"
+
+    return msg
+
+
+def check_plane_in_flight(departing_at, arriving_at, plane):
+    planes = Flight.query.filter(Flight.plane_id.__eq__(plane)).all()
+    if planes:
+        for p in planes:
+            if arriving_at < p.departing_at or p.arriving_at < departing_at:
+                msg = "success"
+            else:
+                msg = "Máy bay đã có lịch bay trong khoảng thời gian này"
+    else:
+        msg = "success"
 
     return msg
 
@@ -94,7 +100,9 @@ def check_flight(id, name, departing_at, arriving_at, plane):
         if flight:
             msg = "Mã chuyến bay đã tồn tại"
         else:
-            msg = check_flight_follow_regulation(departing_at, arriving_at, plane)
+            msg = check_time_flight(departing_at, arriving_at)
+            if msg == 'success':
+                msg = check_plane_in_flight(departing_at, arriving_at, plane)
     else:
         msg = "Thông tin chuyến bay chưa được điền đầy đủ!"
     return msg
@@ -120,41 +128,50 @@ def update_flight(model, id, name, departing_at, arriving_at, plane, airline):
     db.session.commit()
 
 
-def check_apm_follow_regulation(min_stop, max_stop, airline, stop_airport, flight_id):
-    rt_min = get_regulation_time_by_id(6)
-    rt_max = get_regulation_time_by_id(7)
+def check_time_stop(begin, finish, flight_id):
+    rt_begin = get_regulation_time_by_id(6)
+    rt_finish = get_regulation_time_by_id(7)
 
-    stop_duration = max_stop - min_stop
-    if rt_min and rt_max:
-        if stop_duration.total_seconds() >= rt_min.total_seconds() \
-                and stop_duration.total_seconds() <= rt_max.total_seconds():
+    stop_duration = finish - begin
+    if rt_begin and rt_finish:
+        if stop_duration.total_seconds() >= rt_begin.total_seconds() \
+                and stop_duration.total_seconds() <= rt_finish.total_seconds():
             f = Flight.query.get(flight_id)
-            if min_stop > f.departing_at and max_stop < f.arriving_at:
-                al = AirLine.query.filter(AirLine.name.__eq__(airline)).first()
-                ap = AirPort.query.filter(AirPort.name.__eq__(stop_airport)).first()
-                if ap.id != al.from_airport_id and ap.id != al.to_airport_id:
-                    apm = Flight_AirportMedium.query.filter(
-                        Flight_AirportMedium.flight_id.__eq__(flight_id),
-                        Flight_AirportMedium.airport_medium_id.__eq__(ap.id)
-                    ).first()
-                    if apm:
-                        check_am_msg = 'Sân bay này đã được chọn làm trung gian. Vui lòng chọn sân bay khác!'
-                    else:
-                        check_am_msg = 'success'
-                else:
-                    check_am_msg = 'Sân bay dừng đã thuộc tuyến bay'
+            if begin > f.departing_at and finish < f.arriving_at:
+                check_duration_msg = 'success'
             else:
-                check_am_msg = 'Thời gian dừng không phù hợp với thời gian bay'
+                check_duration_msg = 'Thời gian dừng không phù hợp với thời gian bay'
         else:
-            check_am_msg = 'Thời gian dừng không đúng quy định'
+            check_duration_msg = 'Thời gian dừng không đúng quy định'
     else:
-        check_am_msg = 'Vui lòng thiết lập quy định về thời gian dừng tối thiểu và tối đa'
+        check_duration_msg = 'Vui lòng thiết lập quy định về thời gian dừng tối thiểu và tối đa'
+
+    return check_duration_msg
+
+
+def check_airport_in_medium(airline, stop_airport, flight_id):
+    al = AirLine.query.filter(AirLine.name.__eq__(airline)).first()
+    ap = AirPort.query.filter(AirPort.name.__eq__(stop_airport)).first()
+    if ap.id != al.from_airport_id and ap.id != al.to_airport_id:
+        apm = Flight_AirportMedium.query.filter(
+            Flight_AirportMedium.flight_id.__eq__(flight_id),
+            Flight_AirportMedium.airport_medium_id.__eq__(ap.id)
+        ).first()
+        if apm:
+            check_am_msg = 'Sân bay này đã được chọn làm trung gian. Vui lòng chọn sân bay khác!'
+        else:
+            check_am_msg = 'success'
+    else:
+        check_am_msg = 'Sân bay dừng đã thuộc tuyến bay'
+
     return check_am_msg
 
 
-def check_airport_medium(name, min_stop, max_stop, airline, stop_airport, flight_id):
-    if name and min_stop and max_stop:
-        check_am_msg = check_apm_follow_regulation(min_stop, max_stop, airline, stop_airport, flight_id)
+def check_stop_station(name, begin, finish, airline, stop_airport, flight_id):
+    if name and begin and finish:
+        check_am_msg = check_time_stop(begin, finish, flight_id)
+        if check_am_msg == 'success':
+            check_am_msg = check_airport_in_medium(airline,stop_airport, flight_id)
     else:
         check_am_msg = 'Thông tin trạm dừng chưa được điền đầy đủ'
     return check_am_msg
