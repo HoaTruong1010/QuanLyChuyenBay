@@ -184,7 +184,7 @@ class PlaneTicket(db.Model):
     profile_id = (Column(Integer, ForeignKey(Profile.serial, ondelete="CASCADE", onupdate="cascade"), nullable=False))
     flight_id = (Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE", onupdate="cascade"), nullable=False))
     seat_id = (Column(Integer, ForeignKey(Seat.id, ondelete="CASCADE", onupdate="cascade"), nullable=False))
-    user_id = (Column(Integer, ForeignKey(User.id, ondelete="CASCADE", onupdate="cascade"), nullable=True))
+    user_id = (Column(Integer, ForeignKey(User.id, ondelete="CASCADE", onupdate="cascade")))
 
     places = relationship("AirPort", foreign_keys=[place], lazy=True,
                           cascade="all, delete", passive_deletes=True)
@@ -192,7 +192,7 @@ class PlaneTicket(db.Model):
                             cascade="all, delete", passive_deletes=True)
     flights = relationship("Flight", foreign_keys=[flight_id], lazy=True,
                            cascade="all, delete", passive_deletes=True)
-    seats = relationship("Seat", foreign_keys=[seat_id], lazy=True,
+    seats = relationship("Seat", foreign_keys=[seat_id], lazy=True, uselist=False,
                          cascade="all, delete", passive_deletes=True)
     users = relationship("User", foreign_keys=[user_id], lazy=True,
                          cascade="all, delete", passive_deletes=True)
@@ -308,9 +308,7 @@ if __name__ == '__main__':
                          flight_id='CB2', seat_id=1, user_id='2')
         t3 = PlaneTicket(rank='1', price=1400000, place="3", profile_id='3',
                          flight_id='CB3', seat_id=2, user_id='2')
-        t4 = PlaneTicket(rank='2', price=800000, date=datetime(2022,11,5,12,00,20) , place="2", profile_id='1',
-                         flight_id='CB1', seat_id=2, user_id='2')
-        db.session.add_all([t1, t2, t3, t4])
+        db.session.add_all([t1, t2, t3])
         db.session.commit()
 
         g1 = Regulation(name='book_time', value='12:00:00',
