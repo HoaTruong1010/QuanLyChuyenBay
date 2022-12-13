@@ -38,6 +38,8 @@ class AuthenticatedView(BaseView):
 
 
 class RegulationView(AuthenticatedModelView):
+    can_delete = False
+    form_excluded_columns = ['regulations','tickets']
     column_filters = ['name', 'description']
     column_searchable_list = ['name', 'description']
     column_labels = {
@@ -82,6 +84,9 @@ class FlightManagementView(AuthenticatedModelView):
         am_msg = ''
         form = FlightForm()
 
+        list_regulation = [5]
+        list_stop_regulation = [6, 7]
+
         form.planes.choices = [p.id for p in AirPlane.query.all()]
         form.airlines.choices = [a.name for a in AirLine.query.all()]
 
@@ -93,11 +98,12 @@ class FlightManagementView(AuthenticatedModelView):
             plane = form.planes.data
             airline = form.airlines.data
 
-            sts_msg = utils.check_flight(id, name, departing_at, arriving_at, plane)
+            sts_msg = utils.check_flight(id, name, departing_at, arriving_at, plane, list_regulation[0])
 
             if sts_msg == 'success':
                 try:
-                    utils.save_flight(id, name, departing_at, arriving_at, plane, airline)
+                    reg = Regulation.query.get(list_regulation[0])
+                    utils.save_flight(id, name, departing_at, arriving_at, plane, airline, reg)
                 except:
                     sts_msg = 'Đã có lỗi xảy ra khi lưu chuyến bay! Vui lòng quay lại sau!'
 
@@ -118,12 +124,12 @@ class FlightManagementView(AuthenticatedModelView):
                         am_ap = request.form[str_ap]
                         am_msg = utils.check_stop_station(am_name, am_stb,
                                                           am_stf, airline,
-                                                          am_ap, id)
+                                                          am_ap, id, list_stop_regulation)
                         if am_msg == 'success':
                             try:
                                 utils.save_airport_medium(am_name, am_stb,
                                                           am_stf, am_des,
-                                                          id, am_ap)
+                                                          id, am_ap, list_stop_regulation)
                             except:
                                 utils.del_flight(id)
                                 am_msg = 'Đã có lỗi xảy ra khi lưu sân bay trung gian! Vui lòng quay lại sau!'
@@ -135,8 +141,9 @@ class FlightManagementView(AuthenticatedModelView):
                 form.id.data = ""
                 form.name.data = ""
 
-        return self.render('admin/flight.html', form=form,
-                           sts_msg=sts_msg, am_msg=am_msg, return_url=return_url)
+        return self.render('admin/flight.html', form=form,list_regulation=list_regulation,
+                           sts_msg=sts_msg, am_msg=am_msg,
+                           list_stop_regulation=list_stop_regulation, return_url=return_url)
 
     @expose('/edit/', methods=('GET', 'POST'))
     def edit_view(self):
@@ -172,6 +179,9 @@ class FlightManagementView(AuthenticatedModelView):
 
         medium_num = len(medium_list)
 
+        fl_reg = [5]
+        stop_reg = [6, 7]
+
         if request.method == "POST":
             f_id = form.id.data
             name = form.name.data
@@ -183,7 +193,7 @@ class FlightManagementView(AuthenticatedModelView):
             sts_msg = 'success'
 
             if departing_at != model.departing_at or arriving_at != model.arriving_at:
-                sts_msg = utils.check_time_flight(departing_at, arriving_at)
+                sts_msg = utils.check_time_flight(departing_at, arriving_at, fl_reg[0])
 
             if plane != model.plane_id:
                 sts_msg = utils.check_plane_in_flight(departing_at, arriving_at, plane)
@@ -221,12 +231,13 @@ class FlightManagementView(AuthenticatedModelView):
                             am_edit_des = request.form[str_edit_des]
                             am_edit_ap = request.form[str_edit_ap]
 
+                            am_edit_msg = 'success'
 
                             if am_edit_stb != medium_list[i].stop_time_begin or \
                                 am_edit_stf != medium_list[i].stop_time_finish:
-                                am_edit_msg = utils.check_time_stop(am_edit_stb, am_edit_stf, model.id)
+                                am_edit_msg = utils.check_time_stop(am_edit_stb, am_edit_stf, model.id, stop_reg)
 
-                            if am_edit_ap != medium_list[i].aiports.name or airline != old_airline:
+                            if am_edit_ap != medium_list[i].airports.name or airline != old_airline:
                                 am_edit_msg = utils.check_airport_in_medium(airline, am_edit_ap, model.id)
 
                             if am_edit_msg == 'success':
@@ -265,13 +276,13 @@ class FlightManagementView(AuthenticatedModelView):
                         am_stf = datetime.strptime(request.form[str_stf], "%Y-%m-%dT%H:%M")
                         am_des = request.form[str_des]
                         am_ap = request.form[str_ap]
-                        am_msg = utils.check_stop_station(am_name, am_stb,
-                                                          am_stf, airline, am_ap, model.id)
+                        am_msg = utils.check_stop_station(am_name, am_stb, am_stf, airline,
+                                                          am_ap, model.id, stop_reg)
                         if am_msg == 'success':
                             try:
                                 utils.save_airport_medium(am_name, am_stb,
                                                          am_stf, am_des,
-                                                         model.id, am_ap)
+                                                         model.id, am_ap, stop_reg)
                             except:
                                 utils.update_flight(model, old_model.id, old_model.name,
                                                     old_model.departing_at, old_model.arriving_at,
@@ -287,7 +298,7 @@ class FlightManagementView(AuthenticatedModelView):
                 if am_edit_msg == 'success' or am_edit_msg == '':
                     if am_msg == 'success' or am_msg == '':
                         flash(gettext('Record was successfully saved.'), 'success')
-                        return redirect(self.get_url('.details_view', id=request.args.get('id'), url=return_url))
+                        return redirect(self.get_url('.details_view', id=model.id, url=return_url))
 
         if request.method == 'GET' or form.errors:
             self.on_form_prefill(form, model.id)

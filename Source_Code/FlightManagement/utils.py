@@ -63,12 +63,15 @@ def take_time(str_date, format):
 
 def get_regulation_time_by_id(id):
     date = Regulation.query.get(id)
-    return take_time(date.get_value(), "%H:%M:%S")
+    if date:
+        return take_time(date.get_value(), "%H:%M:%S")
+    else:
+        return None
 
 
-def check_time_flight(departing_at, arriving_at):
+def check_time_flight(departing_at, arriving_at, regulation_id):
     duration = arriving_at - departing_at
-    rt = get_regulation_time_by_id(5)
+    rt = get_regulation_time_by_id(regulation_id)
     if rt:
         if duration.total_seconds() > rt.total_seconds():
             msg = "success"
@@ -94,13 +97,13 @@ def check_plane_in_flight(departing_at, arriving_at, plane):
     return msg
 
 
-def check_flight(id, name, departing_at, arriving_at, plane):
+def check_flight(id, name, departing_at, arriving_at, plane, regulation_id):
     if id and name and departing_at and arriving_at:
         flight = Flight.query.filter(Flight.id.__eq__(id.strip())).first()
         if flight:
             msg = "Mã chuyến bay đã tồn tại"
         else:
-            msg = check_time_flight(departing_at, arriving_at)
+            msg = check_time_flight(departing_at, arriving_at, regulation_id)
             if msg == 'success':
                 msg = check_plane_in_flight(departing_at, arriving_at, plane)
     else:
@@ -108,11 +111,12 @@ def check_flight(id, name, departing_at, arriving_at, plane):
     return msg
 
 
-def save_flight(id, name, departing_at, arriving_at, plane, airline):
+def save_flight(id, name, departing_at, arriving_at, plane, airline, fl_reg):
     al_id = AirLine.query.filter(AirLine.name.__eq__(airline)).first()
     f = Flight(id=id, name=name,
                departing_at=departing_at, arriving_at=arriving_at,
                plane_id=plane, airline_id=al_id.id)
+    f.regulations.append(fl_reg)
     db.session.add(f)
     db.session.commit()
 
@@ -128,9 +132,9 @@ def update_flight(model, id, name, departing_at, arriving_at, plane, airline):
     db.session.commit()
 
 
-def check_time_stop(begin, finish, flight_id):
-    rt_begin = get_regulation_time_by_id(6)
-    rt_finish = get_regulation_time_by_id(7)
+def check_time_stop(begin, finish, flight_id, list_regulation):
+    rt_begin = get_regulation_time_by_id(list_regulation[0])
+    rt_finish = get_regulation_time_by_id(list_regulation[1])
 
     stop_duration = finish - begin
     if rt_begin and rt_finish:
@@ -167,9 +171,9 @@ def check_airport_in_medium(airline, stop_airport, flight_id):
     return check_am_msg
 
 
-def check_stop_station(name, begin, finish, airline, stop_airport, flight_id):
+def check_stop_station(name, begin, finish, airline, stop_airport, flight_id, list_regulation):
     if name and begin and finish:
-        check_am_msg = check_time_stop(begin, finish, flight_id)
+        check_am_msg = check_time_stop(begin, finish, flight_id, list_regulation)
         if check_am_msg == 'success':
             check_am_msg = check_airport_in_medium(airline,stop_airport, flight_id)
     else:
@@ -177,10 +181,13 @@ def check_stop_station(name, begin, finish, airline, stop_airport, flight_id):
     return check_am_msg
 
 
-def save_airport_medium(name, min_stop, max_stop, description, flight_id, airport):
+def save_airport_medium(name, min_stop, max_stop, description, flight_id, airport, list_reg):
     ap = AirPort.query.filter(AirPort.name.__eq__(airport)).first()
     apm = Flight_AirportMedium(name=name, stop_time_begin=min_stop, stop_time_finish=max_stop,
                description=description, flight_id=flight_id, airport_medium_id=ap.id)
+    for r in list_reg:
+        far = FA_Regulation(flight_id=flight_id, airport_id=ap.id, regulation_id=r)
+        db.session.add(far)
     db.session.add(apm)
     db.session.commit()
 
