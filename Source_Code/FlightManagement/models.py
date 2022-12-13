@@ -1,7 +1,6 @@
 import string
-
-from sqlalchemy import Column, Integer, String, Boolean, DECIMAL, ForeignKey, DateTime, Enum, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Boolean, DECIMAL, ForeignKey, DateTime, Enum, Text, subquery
+from sqlalchemy.orm import relationship, backref
 from FlightManagement import db, app
 from enum import Enum as UserEnum
 from flask_login import UserMixin
@@ -89,6 +88,12 @@ class AirLine(db.Model):
         return str(self.name)
 
 
+flight_regulation = db.Table('flight_regulation',
+    Column('flight_id', String(10), ForeignKey('flights.id', ondelete="CASCADE", onupdate="cascade"), primary_key=True),
+    Column('regulation_id', Integer, ForeignKey('regulations.id', ondelete="CASCADE", onupdate="cascade"), primary_key=True)
+)
+
+
 class Flight(db.Model):
     __tablename__ = 'flights'
 
@@ -104,6 +109,9 @@ class Flight(db.Model):
     airlines = relationship("AirLine", foreign_keys=[airline_id], lazy=True,
                             passive_deletes=True, cascade="all, delete")
 
+    regulations = relationship("Regulation", secondary=flight_regulation, lazy='subquery',
+                            backref=backref('regulations', lazy=True), passive_deletes=True, cascade="all, delete")
+
     def __str__(self):
         return str(self.name)
 
@@ -111,7 +119,7 @@ class Flight(db.Model):
 class Seat(db.Model):
     __tablename__ = 'seats'
 
-    id = Column(String(10), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
     status = Column(Boolean, default=False)
 
@@ -123,6 +131,22 @@ class Seat(db.Model):
         return str(self.id)
 
 
+class FA_Regulation(db.Model):
+    flight_id = Column(String(10), ForeignKey('flight_airport_mediums.flight_id', ondelete="CASCADE",
+                            onupdate="cascade"), primary_key=True)
+    airport_id = Column(Integer, ForeignKey('flight_airport_mediums.airport_medium_id', ondelete="CASCADE",
+                            onupdate="cascade"), primary_key=True)
+    regulation_id = Column(Integer, ForeignKey('regulations.id', ondelete="CASCADE",
+                                                onupdate="cascade"), primary_key=True)
+
+    flights = relationship("Flight_AirportMedium", foreign_keys=[flight_id], lazy='subquery',
+                           passive_deletes=True, cascade="all, delete")
+    airports = relationship("Flight_AirportMedium", foreign_keys=[airport_id], lazy='subquery',
+                           passive_deletes=True, cascade="all, delete")
+    regs = relationship("Regulation", foreign_keys=[regulation_id], lazy='subquery',
+                        passive_deletes=True, cascade="all, delete")
+
+
 class Flight_AirportMedium(db.Model):
     __tablename__ = 'flight_airport_mediums'
 
@@ -132,9 +156,7 @@ class Flight_AirportMedium(db.Model):
     description = Column(Text)
 
     flight_id = Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE", onupdate="cascade"), primary_key=True)
-    airport_medium_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"),
-                               primary_key=True)
-
+    airport_medium_id = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"), primary_key=True)
     flights = relationship("Flight", foreign_keys=[flight_id], lazy=True,
                            passive_deletes=True, cascade="all, delete")
     airports = relationship("AirPort", foreign_keys=[airport_medium_id], lazy=True,
@@ -142,6 +164,12 @@ class Flight_AirportMedium(db.Model):
 
     def __str__(self):
         return str(self.name)
+
+
+ticket_regulation = db.Table('ticket_regulation',
+    Column('ticket_id', Integer, ForeignKey('tickets.id', ondelete="CASCADE", onupdate="cascade"), primary_key=True),
+    Column('regulation_id', Integer, ForeignKey('regulations.id', ondelete="CASCADE", onupdate="cascade"), primary_key=True)
+)
 
 
 class PlaneTicket(db.Model):
@@ -155,7 +183,7 @@ class PlaneTicket(db.Model):
     place = Column(Integer, ForeignKey(AirPort.id, ondelete="CASCADE", onupdate="cascade"))
     profile_id = (Column(Integer, ForeignKey(Profile.serial, ondelete="CASCADE", onupdate="cascade"), nullable=False))
     flight_id = (Column(String(10), ForeignKey(Flight.id, ondelete="CASCADE", onupdate="cascade"), nullable=False))
-    seat_id = (Column(String(10), ForeignKey(Seat.id, ondelete="CASCADE", onupdate="cascade"), nullable=False))
+    seat_id = (Column(Integer, ForeignKey(Seat.id, ondelete="CASCADE", onupdate="cascade"), nullable=False))
     user_id = (Column(Integer, ForeignKey(User.id, ondelete="CASCADE", onupdate="cascade"), nullable=True))
 
     places = relationship("AirPort", foreign_keys=[place], lazy=True,
@@ -181,6 +209,9 @@ class Regulation(db.Model):
     value = Column(String(50), nullable=False)
     description = Column(Text)
 
+    tickets = relationship("PlaneTicket", secondary=ticket_regulation, lazy='subquery',
+                        backref=backref('tickets', lazy=True), passive_deletes=True, cascade="all, delete")
+
     def __str__(self):
         return str(self.id)
 
@@ -190,107 +221,116 @@ class Regulation(db.Model):
 
 if __name__ == '__main__':
     with app.app_context():
-        # db.drop_all()
-        # db.create_all()
-        #
-        # password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
-        # u1 = User(name='An', username='an1100', password=password,
-        #           user_role=UserRole.USER)
-        # u2 = User(name='Binh', username='binh1211', password=password,
-        #           user_role=UserRole.EMPLOYEE)
-        # u3 = User(name='Dong', username='dong1100', password=password,
-        #           user_role=UserRole.ADMIN)
-        # db.session.add_all([u1, u2, u3])
-        # db.session.commit()
-        #
-        # p1 = Profile(id='01231', name='Nguyen Van An', gender='nam', dob=datetime(2002,1,1), email='an1100@gmail.com',
-        #              phone='0176448394')
-        # p2 = Profile(id='01232', name='Le Thi Binh', gender='nu', dob=datetime(2001, 11, 6),
-        # email='binh1211@gmail.com',
-        #              phone='0176640394')
-        # p3 = Profile(id='01233', name='Tran Van Dong', gender='nam', dob=datetime(2000, 4, 17),
-        #              email='dong1100@gmail.com',
-        #              phone='0176470094', isSupervisor=True)
-        # db.session.add_all([p1, p2, p3])
-        # db.session.commit()
-        #
-        # pl1 = AirPlane(id='MB1', name='May bay 1', manufacturer='VN AirLine', total_seat=60)
-        # pl2 = AirPlane(id='MB2', name='May bay 2', manufacturer='VN AirLine', total_seat=70)
-        # pl3 = AirPlane(id='MB3', name='May bay 3', manufacturer='VN AirLine', total_seat=65)
-        # db.session.add_all([pl1, pl2, pl3])
-        # db.session.commit()
-        #
-        #
-        # sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội',
-        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/HaNoi_wkzzg5.jpg')
-        # sb2 = AirPort(name='Sân bay Tân Sơn Nhất', location='Hồ Chí Minh',
-        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266575/Airport_Location/HCM_jpkw5e.jpg')
-        # sb3 = AirPort(name='Sân bay Phù Cát', location='Bình Định',
-        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/BinhDinh_c6yrif.jpg')
-        # sb4 = AirPort(name='Sân bay Narita', location='Nhật Bản',
-        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266739/Airport_Location/NhatBan_fzo3qw.jpg')
-        # sb5 = AirPort(name='Sân bay Bangkok', location='Thái Lan',
-        #               image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266384/Airport_Location/ThaiLan_k533hb.jpg')
-        # db.session.add_all([sb1, sb2, sb3, sb4, sb5])
-        # db.session.commit()
-        #
-        # al1 = AirLine(id='1', name='Hà Nội - Hồ Chí Minh', from_airport_id='1', to_airport_id='2')
-        # al2 = AirLine(id='2', name='Hà Nội - Bình Định', from_airport_id='1', to_airport_id='3')
-        # al3 = AirLine(id='3', name='Bình Định - Hồ Chí Minh', from_airport_id='3', to_airport_id='2')
-        # al4 = AirLine(id='4', name='Hồ Chí Minh - Nhật Bản', from_airport_id='2', to_airport_id='4')
-        # al5 = AirLine(id='5', name='Hồ Chí Minh - Thái Lan', from_airport_id='2', to_airport_id='5')
-        # db.session.add_all([al1, al2, al3, al4, al5])
-        # db.session.commit()
-        #
-        # f1 = Flight(id='CB1', name='Chuyến bay 001', departing_at=datetime(2022, 12, 1, 13, 00, 00),
-        #             arriving_at=datetime(2022, 12, 1, 14, 00, 00), plane_id='MB1', airline_id='1')
-        # f2 = Flight(id='CB2', name='Chuyến bay 002', departing_at=datetime(2022, 12, 1, 18, 00, 00),
-        #             arriving_at=datetime(2022, 12, 1, 19, 00, 00), plane_id='MB2', airline_id='2')
-        # f3 = Flight(id='CB3', name='Chuyến bay 003', departing_at=datetime(2022, 12, 1, 9, 00, 00),
-        #             arriving_at=datetime(2022, 12, 1, 9, 50, 00), plane_id='MB3', airline_id='3')
-        # f4 = Flight(id='CB4', name='Chuyến bay 004', departing_at=datetime(2022, 12, 11, 9, 00, 00),
-        #             arriving_at=datetime(2022, 12, 11, 18, 50, 00), plane_id='MB2', airline_id='3')
-        # db.session.add_all([f1, f2, f3, f4])
-        # db.session.commit()
-        #
-        # s1 = Seat(id='G1', name='Ghế 1', flight_id='CB1')
-        # s2 = Seat(id='G2', name='Ghế 2', flight_id='CB2')
-        # s3 = Seat(id='G3', name='Ghế 3', flight_id='CB3')
-        # db.session.add_all([s1, s2, s3])
-        # db.session.commit()
-        #
-        # fam1 = Flight_AirportMedium(name='Tram dung 1', stop_time_begin=datetime(2022, 12, 1, 13, 10, 00),
-        #                             stop_time_finish=datetime(2022, 12, 1, 13, 35, 00),
-        #                             description="CB được nghỉ tại đây 20 phút", flight_id='CB1',
-        #                             airport_medium_id='3')
-        # db.session.add(fam1)
-        # db.session.commit()
-        #
-        # t1 = PlaneTicket(rank='2', price=1800000, place="1", profile_id='1',
-        #                  flight_id='CB1', seat_id='G1', user_id='2')
-        # t2 = PlaneTicket(rank='1', price=2000000, place="1", profile_id='2',
-        #                  flight_id='CB2', seat_id='G1', user_id='2')
-        # t3 = PlaneTicket(rank='1', price=1400000, place="3", profile_id='3',
-        #                  flight_id='CB3', seat_id='G2', user_id='2')
-        # db.session.add_all([t1, t2, t3])
-        # db.session.commit()
-        #
-        # g1 = Regulation(name='book_time', value='12:00:00',
-        #                 description='Thời gian đặt vé trước 12h lúc chuyến bay khởi hành')
-        # g2 = Regulation(name='sale_time', value='4:00:00',
-        #                 description='Thời gian bán vé trước 4h lúc chuyến bay khởi hành')
-        # g3 = Regulation(name='1', value='300000',
-        #                 description='Vé hạng 1 có đơn giá là 300.000 VND')
-        # g4 = Regulation(name='2', value='200000',
-        #                 description='Vé hạng 2 có đơn giá là 200.000 VND')
-        # g5 = Regulation(name='duration', value='00:30:00',
-        #                 description='Thời gian bay tối thiểu là 30 phút')
-        # g6 = Regulation(name='min_stop', value='00:20:00',
-        #                 description='Thời gian máy bay được dừng tối thiểu 20 phút')
-        # g7 = Regulation(name='max_stop', value='00:30:00',
-        #                 description='Thời gian máy bay được dừng tối đa 30 phút')
-        # db.session.add_all([g1, g2, g3, g4, g5, g6, g7])
-        # db.session.commit()
+
+        db.drop_all()
+        db.create_all()
+
+        password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
+        u1 = User(name='An', username='an1100', password=password,
+                  user_role=UserRole.USER)
+        u2 = User(name='Binh', username='binh1211', password=password,
+                  user_role=UserRole.EMPLOYEE)
+        u3 = User(name='Dong', username='dong1100', password=password,
+                  user_role=UserRole.ADMIN)
+        db.session.add_all([u1, u2, u3])
+        db.session.commit()
+
+        p1 = Profile(id='01231', name='Nguyen Van An', gender='nam', dob=datetime(2002,1,1), email='an1100@gmail.com',
+                     phone='0176448394')
+        p2 = Profile(id='01232', name='Le Thi Binh', gender='nu', dob=datetime(2001, 11, 6),
+        email='binh1211@gmail.com',
+                     phone='0176640394')
+        p3 = Profile(id='01233', name='Tran Van Dong', gender='nam', dob=datetime(2000, 4, 17),
+                     email='dong1100@gmail.com',
+                     phone='0176470094', isSupervisor=True)
+        db.session.add_all([p1, p2, p3])
+        db.session.commit()
+
+        pl1 = AirPlane(id='MB1', name='May bay 1', manufacturer='VN AirLine', total_seat=60)
+        pl2 = AirPlane(id='MB2', name='May bay 2', manufacturer='VN AirLine', total_seat=70)
+        pl3 = AirPlane(id='MB3', name='May bay 3', manufacturer='VN AirLine', total_seat=65)
+        db.session.add_all([pl1, pl2, pl3])
+        db.session.commit()
 
 
+        sb1 = AirPort(name='Sân bay Nội Bài', location='Hà Nội',
+                      image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/HaNoi_wkzzg5.jpg')
+        sb2 = AirPort(name='Sân bay Tân Sơn Nhất', location='Hồ Chí Minh',
+                      image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266575/Airport_Location/HCM_jpkw5e.jpg')
+        sb3 = AirPort(name='Sân bay Phù Cát', location='Bình Định',
+                      image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266574/Airport_Location/BinhDinh_c6yrif.jpg')
+        sb4 = AirPort(name='Sân bay Narita', location='Nhật Bản',
+                      image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266739/Airport_Location/NhatBan_fzo3qw.jpg')
+        sb5 = AirPort(name='Sân bay Bangkok', location='Thái Lan',
+                      image='https://res.cloudinary.com/dahppd9es/image/upload/v1670266384/Airport_Location/ThaiLan_k533hb.jpg')
+        db.session.add_all([sb1, sb2, sb3, sb4, sb5])
+        db.session.commit()
+
+        al1 = AirLine(id='1', name='Hà Nội - Hồ Chí Minh', from_airport_id='1', to_airport_id='2')
+        al2 = AirLine(id='2', name='Hà Nội - Bình Định', from_airport_id='1', to_airport_id='3')
+        al3 = AirLine(id='3', name='Bình Định - Hồ Chí Minh', from_airport_id='3', to_airport_id='2')
+        al4 = AirLine(id='4', name='Hồ Chí Minh - Nhật Bản', from_airport_id='2', to_airport_id='4')
+        al5 = AirLine(id='5', name='Hồ Chí Minh - Thái Lan', from_airport_id='2', to_airport_id='5')
+        db.session.add_all([al1, al2, al3, al4, al5])
+        db.session.commit()
+
+        f1 = Flight(id='CB1', name='Chuyến bay 001', departing_at=datetime(2022, 12, 1, 13, 00, 00),
+                    arriving_at=datetime(2022, 12, 1, 14, 00, 00), plane_id='MB1', airline_id='1')
+        f2 = Flight(id='CB2', name='Chuyến bay 002', departing_at=datetime(2022, 12, 1, 18, 00, 00),
+                    arriving_at=datetime(2022, 12, 1, 19, 00, 00), plane_id='MB2', airline_id='2')
+        f3 = Flight(id='CB3', name='Chuyến bay 003', departing_at=datetime(2022, 12, 1, 9, 00, 00),
+                    arriving_at=datetime(2022, 12, 1, 9, 50, 00), plane_id='MB3', airline_id='3')
+        f4 = Flight(id='CB4', name='Chuyến bay 004', departing_at=datetime(2022, 12, 11, 9, 00, 00),
+                    arriving_at=datetime(2022, 12, 11, 18, 50, 00), plane_id='MB2', airline_id='3')
+        db.session.add_all([f1, f2, f3, f4])
+        db.session.commit()
+
+        s1 = Seat(name='Ghế 1', flight_id='CB1')
+        s2 = Seat(name='Ghế 2', flight_id='CB2')
+        s3 = Seat(name='Ghế 3', flight_id='CB3')
+        db.session.add_all([s1, s2, s3])
+        db.session.commit()
+
+        fam1 = Flight_AirportMedium(name='Tram dung 1', stop_time_begin=datetime(2022, 12, 1, 13, 10, 00),
+                                    stop_time_finish=datetime(2022, 12, 1, 13, 35, 00),
+                                    description="CB được nghỉ tại đây 20 phút", flight_id='CB1',
+                                    airport_medium_id='3')
+        fam2 = Flight_AirportMedium(name='Tram dung 1', stop_time_begin=datetime(2022, 12, 1, 13, 10, 00),
+                                    stop_time_finish=datetime(2022, 12, 1, 13, 35, 00),
+                                    description="CB được nghỉ tại đây 20 phút", flight_id='CB2',
+                                    airport_medium_id='3')
+        db.session.add_all([fam1, fam2])
+        db.session.commit()
+
+        t1 = PlaneTicket(rank='2', price=1800000, place="1", profile_id='1',
+                         flight_id='CB1', seat_id=1, user_id='2')
+        t2 = PlaneTicket(rank='1', price=2000000, place="1", profile_id='2',
+                         flight_id='CB2', seat_id=1, user_id='2')
+        t3 = PlaneTicket(rank='1', price=1400000, place="3", profile_id='3',
+                         flight_id='CB3', seat_id=2, user_id='2')
+        db.session.add_all([t1, t2, t3])
+        db.session.commit()
+
+        g1 = Regulation(name='book_time', value='12:00:00',
+                        description='Thời gian đặt vé trước 12h lúc chuyến bay khởi hành')
+        g2 = Regulation(name='sale_time', value='4:00:00',
+                        description='Thời gian bán vé trước 4h lúc chuyến bay khởi hành')
+        g3 = Regulation(name='1', value='300000',
+                        description='Vé hạng 1 có đơn giá là 300.000 VND')
+        g4 = Regulation(name='2', value='200000',
+                        description='Vé hạng 2 có đơn giá là 200.000 VND')
+        g5 = Regulation(name='duration', value='00:30:00',
+                        description='Thời gian bay tối thiểu là 30 phút')
+        g6 = Regulation(name='min_stop', value='00:20:00',
+                        description='Thời gian máy bay được dừng tối thiểu 20 phút')
+        g7 = Regulation(name='max_stop', value='00:30:00',
+                        description='Thời gian máy bay được dừng tối đa 30 phút')
+        db.session.add_all([g1, g2, g3, g4, g5, g6, g7])
+        db.session.commit()
+
+        f3.regulations.append(g5)
+        g3.tickets.append(t1)
+        far = FA_Regulation(flight_id=fam1.flight_id, airport_id=fam1.airport_medium_id, regulation_id=g6.id)
+        db.session.add(far)
+        db.session.commit()
         pass
