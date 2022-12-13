@@ -34,7 +34,7 @@ class AuthenticatedModelView(Base_View):
 
 class AuthenticatedView(BaseView):
     def is_accessible(self):
-        return current_user.is_authenticated
+        return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
 
 
 class RegulationView(AuthenticatedModelView):
