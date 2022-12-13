@@ -18,6 +18,17 @@
             <p>Thời gian đến: {{ flight.arriving_at }}</p>
             <p>Hãng bay: {{ flight.planes.manufacturer }}</p>
 
+            {%if Flight_AirportMedium  %}
+                {% for m in Flight_AirportMedium %}
+                    <hr>
+                    <p>Tên trạm dừng: {{m}}</p>
+                    <p>Dừng tại: {{m.airports.name}}</p>
+                    <p>Thông báo: {{m.description}}</p>
+                {% endfor %}
+            {%else%}
+                <p>Bay thẳng </p>
+            {% endif%}
+            <hr>
             <form>
                 <div>
                     <label for="rank">Hạng vé:</label>
@@ -46,7 +57,8 @@
                                 value="0" min="0" max="10" step="1" style="width: 100%"/>
                     </div>
                 </div>
-                <button class="block curser-pointer flex flex-nowrap btn-choose" style="height: 35px">ĐẶT MUA</button>
+                <button class="block curser-pointer flex flex-nowrap btn-choose"
+                        style="height: 35px">ĐẶT MUA</button>
             </form>
 
         </div>
