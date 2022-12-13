@@ -47,21 +47,21 @@ function number_of_mediums(str_number) {
                     <label for="name-stop-${i}" class="control-label">Tên trạm
                         <strong style="color: red">*</strong>
                     </label>
-                    <input class="form-control" id="name-stop-${i}"
+                    <input class="form-control" id="name-stop-${i}" required
                            maxlength="50" name="name-stop-${i}" type="text" value="">
                 </div>
                 <div class="form-group ">
                     <label for="stop-time-begin-${i}" class="control-label">Thời gian bắt đầu dừng
                         <strong style="color: red">*</strong>
                     </label>
-                    <input class="form-control" id="stop-time-begin-${i}"
+                    <input class="form-control" id="stop-time-begin-${i}" required
                            maxlength="50" name="stop-time-begin-${i}" type="datetime-local" value="">
                 </div>
                 <div class="form-group ">
                     <label for="stop-time-finish-${i}" class="control-label">Thời gian dừng kết thúc
                         <strong style="color: red">*</strong>
                     </label>
-                    <input class="form-control" id="stop-time-finish-${i}"
+                    <input class="form-control" id="stop-time-finish-${i}" required
                            maxlength="50" name="stop-time-finish-${i}" type="datetime-local" value="">
                 </div>
                 <div class="form-group ">

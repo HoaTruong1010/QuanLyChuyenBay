@@ -38,6 +38,8 @@ class AuthenticatedView(BaseView):
 
 
 class RegulationView(AuthenticatedModelView):
+    details_modal = True
+    edit_modal = True
     can_delete = False
     form_excluded_columns = ['regulations','tickets']
     column_filters = ['name', 'description']
@@ -108,34 +110,34 @@ class FlightManagementView(AuthenticatedModelView):
                     sts_msg = 'Đã có lỗi xảy ra khi lưu chuyến bay! Vui lòng quay lại sau!'
 
                 if 'isMedium' in request.form:
-                    am_number = request.form['number']
-                    num = int(am_number)
-                    for i in range(num):
-                        str_name = "name-stop-" + str(i)
-                        str_stb = "stop-time-begin-" + str(i)
-                        str_stf = "stop-time-finish-" + str(i)
-                        str_des = "description-" + str(i)
-                        str_ap = "form-select-" + str(i)
+                    if 'number' in request.form:
+                        num = int(request.form['number'])
+                        for i in range(num):
+                            str_name = "name-stop-" + str(i)
+                            str_stb = "stop-time-begin-" + str(i)
+                            str_stf = "stop-time-finish-" + str(i)
+                            str_des = "description-" + str(i)
+                            str_ap = "form-select-" + str(i)
 
-                        am_name = request.form[str_name]
-                        am_stb = datetime.strptime(request.form[str_stb], "%Y-%m-%dT%H:%M")
-                        am_stf = datetime.strptime(request.form[str_stf], "%Y-%m-%dT%H:%M")
-                        am_des = request.form[str_des]
-                        am_ap = request.form[str_ap]
-                        am_msg = utils.check_stop_station(am_name, am_stb,
-                                                          am_stf, airline,
-                                                          am_ap, id, list_stop_regulation)
-                        if am_msg == 'success':
-                            try:
-                                utils.save_airport_medium(am_name, am_stb,
-                                                          am_stf, am_des,
-                                                          id, am_ap, list_stop_regulation)
-                            except:
+                            am_name = request.form[str_name]
+                            am_stb = datetime.strptime(request.form[str_stb], "%Y-%m-%dT%H:%M")
+                            am_stf = datetime.strptime(request.form[str_stf], "%Y-%m-%dT%H:%M")
+                            am_des = request.form[str_des]
+                            am_ap = request.form[str_ap]
+                            am_msg = utils.check_stop_station(am_name, am_stb,
+                                                              am_stf, airline,
+                                                              am_ap, id, list_stop_regulation)
+                            if am_msg == 'success':
+                                try:
+                                    utils.save_airport_medium(am_name, am_stb,
+                                                              am_stf, am_des,
+                                                              id, am_ap, list_stop_regulation)
+                                except:
+                                    utils.del_flight(id)
+                                    am_msg = 'Đã có lỗi xảy ra khi lưu sân bay trung gian! Vui lòng quay lại sau!'
+                            else:
                                 utils.del_flight(id)
-                                am_msg = 'Đã có lỗi xảy ra khi lưu sân bay trung gian! Vui lòng quay lại sau!'
-                        else:
-                            utils.del_flight(id)
-                            am_msg = am_msg
+                                am_msg = am_msg
 
 
                 form.id.data = ""
@@ -262,37 +264,37 @@ class FlightManagementView(AuthenticatedModelView):
 
 
                 if 'isMedium' in request.form:
-                    am_number = request.form['number']
-                    num = int(am_number)
-                    for i in range(num):
-                        str_name = "name-stop-" + str(i)
-                        str_stb = "stop-time-begin-" + str(i)
-                        str_stf = "stop-time-finish-" + str(i)
-                        str_des = "description-" + str(i)
-                        str_ap = "form-select-" + str(i)
+                    if 'number' in request.form:
+                        num = int(request.form['number'])
+                        for i in range(num):
+                            str_name = "name-stop-" + str(i)
+                            str_stb = "stop-time-begin-" + str(i)
+                            str_stf = "stop-time-finish-" + str(i)
+                            str_des = "description-" + str(i)
+                            str_ap = "form-select-" + str(i)
 
-                        am_name = request.form[str_name]
-                        am_stb = datetime.strptime(request.form[str_stb], "%Y-%m-%dT%H:%M")
-                        am_stf = datetime.strptime(request.form[str_stf], "%Y-%m-%dT%H:%M")
-                        am_des = request.form[str_des]
-                        am_ap = request.form[str_ap]
-                        am_msg = utils.check_stop_station(am_name, am_stb, am_stf, airline,
-                                                          am_ap, model.id, stop_reg)
-                        if am_msg == 'success':
-                            try:
-                                utils.save_airport_medium(am_name, am_stb,
-                                                         am_stf, am_des,
-                                                         model.id, am_ap, stop_reg)
-                            except:
+                            am_name = request.form[str_name]
+                            am_stb = datetime.strptime(request.form[str_stb], "%Y-%m-%dT%H:%M")
+                            am_stf = datetime.strptime(request.form[str_stf], "%Y-%m-%dT%H:%M")
+                            am_des = request.form[str_des]
+                            am_ap = request.form[str_ap]
+                            am_msg = utils.check_stop_station(am_name, am_stb, am_stf, airline,
+                                                              am_ap, model.id, stop_reg)
+                            if am_msg == 'success':
+                                try:
+                                    utils.save_airport_medium(am_name, am_stb,
+                                                             am_stf, am_des,
+                                                             model.id, am_ap, stop_reg)
+                                except:
+                                    utils.update_flight(model, old_model.id, old_model.name,
+                                                        old_model.departing_at, old_model.arriving_at,
+                                                        old_model.plane_id, old_airline)
+                                    am_msg = 'Đã có lỗi xảy ra khi lưu trạm dừng! Vui lòng quay lại sau!'
+                            else:
                                 utils.update_flight(model, old_model.id, old_model.name,
                                                     old_model.departing_at, old_model.arriving_at,
                                                     old_model.plane_id, old_airline)
-                                am_msg = 'Đã có lỗi xảy ra khi lưu trạm dừng! Vui lòng quay lại sau!'
-                        else:
-                            utils.update_flight(model, old_model.id, old_model.name,
-                                                old_model.departing_at, old_model.arriving_at,
-                                                old_model.plane_id, old_airline)
-                            am_msg = am_msg
+                                am_msg = am_msg
 
             if sts_msg == 'success':
                 if am_edit_msg == 'success' or am_edit_msg == '':
