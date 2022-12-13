@@ -1,3 +1,4 @@
+import string
 from sqlalchemy import Column, Integer, String, Boolean, DECIMAL, ForeignKey, DateTime, Enum, Text, subquery
 from sqlalchemy.orm import relationship, backref
 from FlightManagement import db, app
@@ -220,6 +221,7 @@ class Regulation(db.Model):
 
 if __name__ == '__main__':
     with app.app_context():
+
         db.drop_all()
         db.create_all()
 
