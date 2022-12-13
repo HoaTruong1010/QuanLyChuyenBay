@@ -12,6 +12,7 @@
                 <th>Doanh thu</th>
                 <th>Tổng lượt bay</th>
             </tr>
+            {% if total > 0 %}
             {% for s in statistics %}
             <tr>
                 <td>{{ s[0] }}</td>
@@ -30,6 +31,15 @@
                 <th scope="row">Tổng doanh thu:</th>
                 <th scope="row">{{ "{:,.1f}".format(total) }} VNĐ</th>
             </tr>
+            {% else %}
+            <tr>
+                <td colspan="999">
+                    <div class="text-center text-danger">
+                        Không có mục nào trong bảng.
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
         </table>
     </div>
     <div class="col-md-4 col xs-12">

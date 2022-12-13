@@ -308,7 +308,9 @@ if __name__ == '__main__':
                          flight_id='CB2', seat_id=1, user_id='2')
         t3 = PlaneTicket(rank='1', price=1400000, place="3", profile_id='3',
                          flight_id='CB3', seat_id=2, user_id='2')
-        db.session.add_all([t1, t2, t3])
+        t4 = PlaneTicket(rank='2', price=800000, date=datetime(2022,11,5,12,00,20) , place="2", profile_id='1',
+                         flight_id='CB1', seat_id=2, user_id='2')
+        db.session.add_all([t1, t2, t3, t4])
         db.session.commit()
 
         g1 = Regulation(name='book_time', value='12:00:00',
